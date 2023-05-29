@@ -28,7 +28,7 @@ int32 APIENTRY wWinMain(
         if (!Window::InitInstance(process, nCmdShow, classNameMainWindow, titleMainWindow, windowPosition, windowArea)) return FALSE;
 
         {
-
+            Tests::Key32();
         }
 
         /* { // TESTS

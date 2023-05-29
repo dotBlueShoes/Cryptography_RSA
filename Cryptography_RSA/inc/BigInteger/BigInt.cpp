@@ -2,6 +2,11 @@
 
 #include <cassert>
 
+#include <sstream>
+#include <string>
+#include <locale>
+#include <codecvt>
+
 int BigInt::base_char=8;
 int BigInt::base=0xFFFFFFFF;
 int BigInt::basebit=5;//2^5
@@ -168,7 +173,7 @@ ostream& operator << (ostream& out, const BigInt& a) {
 		'C','D','E','F'
 	};
 
-	if(a._isnegative)
+	if (a._isnegative)
 		out<<"-";
 
 	BigInt::base_t T=0x0F;
@@ -185,6 +190,29 @@ ostream& operator << (ostream& out, const BigInt& a) {
 	reverse(str.begin(), str.end());
 	out << str;
 	return out;
+}
+
+std::wstring BigInt::toWString() {
+	static char hex[] {
+		'0','1','2','3',
+		'4','5','6','7',
+		'8','9','A','B',
+		'C','D','E','F'
+	};
+
+	BigInt::base_t T = 0x0F;
+	std::string cstring;
+
+	for (BigInt::data_t::const_iterator it = _data.begin(); it != _data.end(); ++it) {
+		BigInt::base_t ch = (*it);
+		for (int j = 0; j < BigInt::base_char; ++j) {
+			cstring.push_back(hex[ch & (T)]);
+			ch = ch >> 4;
+		}
+	}
+
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.from_bytes(cstring);
 }
 
 BigInt operator <<(const BigInt& a,unsigned int n)
