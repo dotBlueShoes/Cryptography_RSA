@@ -256,17 +256,18 @@ std::wstring BigInt::toWString(const bool& negate) {
 	reverse(cstring.begin(), cstring.end());
 
 	// BASE16 -> BASE256
-	const uint32_t count = 8;
-	const uint32_t f8 = cstring.size() / count;
-	const uint32_t r8 = cstring.size() % count;
+	const uint32_t count = 2;
+	const uint32_t f2 = cstring.size() / count;
+	const uint32_t r2 = cstring.size() % count;
 
 	std::string result = "";
-	for (uint32_t i = 0; i < f8; ++i) {
-		uint8_t character = 0;
-		for (int j = 0; j < count; ++j) {
-			character += cstring[(i * count) + j];
-		}
-		result += character;
+	uint8_t character = 0;
+	for (uint32_t i = 0; i < 4; ++i) { 
+		character += cstring[(i * count)]; // 0, 2, 4, 6
+		character <<= 4;
+		character += cstring[(i * count) + 1]; // 1, 3, 5, 7
+		//!// result += character;
+		character = 0;
 	}
 
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -336,17 +337,24 @@ std::string BigInt::toString(const bool& negate) {
 	reverse(cstring.begin(), cstring.end());
 
 	// BASE16 -> BASE256
-	const uint32_t count = 8;
-	const uint32_t f8 = cstring.size() / count;
-	const uint32_t r8 = cstring.size() % count;
+	const uint32_t count = 2;
+	const uint32_t f2 = cstring.size() / count;
+	const uint32_t r2 = cstring.size() % count;
 
 	std::string result = "";
-	for (uint32_t i = 0; i < f8; ++i) {
-		uint8_t character = 0;
-		for (int j = 0; j < count; ++j) {
-			character += cstring[(i * count) + j];
-		}
+	uint8_t character = 0;
+
+	//debug
+	char debug[10] { 0 };
+
+	for (uint32_t i = 0; i < f2; ++i) {
+		character += cstring[(i * count)];		// 0, 2, 4, 6
+		debug[0] = cstring[(i * count)];
+		MessageBoxA(nullptr, debug, "DEBUG", MB_OK);
+		character <<= 4;
+		character += cstring[(i * count) + 1];	// 1, 3, 5, 7
 		result += character;
+		character = 0;
 	}
 
 	return result;

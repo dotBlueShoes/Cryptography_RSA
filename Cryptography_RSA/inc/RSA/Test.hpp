@@ -178,10 +178,10 @@ namespace Tests {
 
 		output = nocryptedMessage.toString();
 		MessageBoxA(nullptr, output.c_str(), "DEBUG LOG NOCRYPTED", MB_OK);
-
+		
 		output = encryptedMessage.toString();
 		MessageBoxA(nullptr, output.c_str(), "DEBUG LOG ENCRYPTED", MB_OK);
-
+		
 		output = decryptedMessage.toString(nocryptedMessage._isnegative);
 		MessageBoxA(nullptr, output.c_str(), "DEBUG LOG DECRYPTED", MB_OK);
 
