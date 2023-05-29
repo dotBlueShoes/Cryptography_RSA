@@ -186,7 +186,8 @@ public:
 	static void div(const BigInt& a,const BigInt& b,BigInt& result,BigInt& ca);
 
 
-	std::wstring toWString();
+	std::wstring toWString(const bool& negate = false);
+	std::string toString(const bool& negate = false);
 
 	vector<base_t> _data;
 	bool _isnegative;

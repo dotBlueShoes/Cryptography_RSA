@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include <windows.h>
 #include <sstream>
 #include <string>
 #include <locale>
@@ -35,11 +36,11 @@ BigInt operator * (const BigInt& a,const BigInt& b)
 		return BigInt::Zero;
 
 	const BigInt &big=a._data.size()>b._data.size()?a:b;
-	const BigInt &small=(&big)==(&a)?b:a;
+	const BigInt &smalll=(&big)==(&a)?b:a;
 
 	BigInt result(0);
 	
-	BigInt::bit bt(small);
+	BigInt::bit bt(smalll);
 	for(int i=bt.size()-1;i>=0;--i)
 	{
 		if(bt.at(i))
@@ -192,27 +193,163 @@ ostream& operator << (ostream& out, const BigInt& a) {
 	return out;
 }
 
-std::wstring BigInt::toWString() {
+std::wstring BigInt::toWString(const bool& negate) {
+	//static char hex[] {
+	//	'0','1','2','3',
+	//	'4','5','6','7',
+	//	'8','9','A','B',
+	//	'C','D','E','F'
+	//};
+	//
+	//static char rev[] {
+	//	'F','E','D','C',
+	//	'B','A','9','8',
+	//	'7','6','5','4',
+	//	'3','2','1','0'
+	//};
+
 	static char hex[] {
-		'0','1','2','3',
-		'4','5','6','7',
-		'8','9','A','B',
-		'C','D','E','F'
+		0,   1,  2,  3,
+		4,   5,  6,  7,
+		8,   9, 10, 11,
+		12, 13, 14, 15
+	};
+
+	static char rev[] {
+		15, 14, 13, 12,
+		11, 10,  9,  8,
+		 7,  6,  5,  4,
+		 3,  2,  1,  0
 	};
 
 	BigInt::base_t T = 0x0F;
 	std::string cstring;
 
-	for (BigInt::data_t::const_iterator it = _data.begin(); it != _data.end(); ++it) {
-		BigInt::base_t ch = (*it);
-		for (int j = 0; j < BigInt::base_char; ++j) {
-			cstring.push_back(hex[ch & (T)]);
-			ch = ch >> 4;
+	if (_isnegative || negate) {
+		for (BigInt::data_t::const_iterator it = _data.begin(); it != _data.end(); ++it) {
+			BigInt::base_t ch = (*it);
+			for (int j = 0; j < BigInt::base_char; ++j) {
+				cstring.push_back(rev[(ch & (T))]);
+				ch = ch >> 4;
+			}
+		}
+
+		if (cstring[0] == 15) { // 'f'
+			cstring[0] = 0;
+			cstring[1] += 1;
+		} else if (cstring[0] == 9) { // '9'
+			cstring[0] = 10; // 'a'
+		} else {
+			cstring[0] += 1;
+		}
+
+	} else {
+		for (BigInt::data_t::const_iterator it = _data.begin(); it != _data.end(); ++it) {
+			BigInt::base_t ch = (*it);
+			for (int j = 0; j < BigInt::base_char; ++j) {
+				cstring.push_back(hex[ch & (T)]);
+				ch = ch >> 4;
+			}
 		}
 	}
 
+	reverse(cstring.begin(), cstring.end());
+
+	// BASE16 -> BASE256
+	const uint32_t count = 8;
+	const uint32_t f8 = cstring.size() / count;
+	const uint32_t r8 = cstring.size() % count;
+
+	std::string result = "";
+	for (uint32_t i = 0; i < f8; ++i) {
+		uint8_t character = 0;
+		for (int j = 0; j < count; ++j) {
+			character += cstring[(i * count) + j];
+		}
+		result += character;
+	}
+
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-	return converter.from_bytes(cstring);
+	return converter.from_bytes(result);
+}
+
+std::string BigInt::toString(const bool& negate) {
+	//static char hex[] {
+	//	'0','1','2','3',
+	//	'4','5','6','7',
+	//	'8','9','A','B',
+	//	'C','D','E','F'
+	//};
+	//
+	//static char rev[] {
+	//	'F','E','D','C',
+	//	'B','A','9','8',
+	//	'7','6','5','4',
+	//	'3','2','1','0'
+	//};
+
+	static char hex[] {
+		0,   1,  2,  3,
+		4,   5,  6,  7,
+		8,   9, 10, 11,
+		12, 13, 14, 15
+	};
+
+	static char rev[] {
+		15, 14, 13, 12,
+		11, 10,  9,  8,
+		 7,  6,  5,  4,
+		 3,  2,  1,  0
+	};
+
+	BigInt::base_t T = 0x0F;
+	std::string cstring;
+
+	if (_isnegative || negate) {
+		for (BigInt::data_t::const_iterator it = _data.begin(); it != _data.end(); ++it) {
+			BigInt::base_t ch = (*it);
+			for (int j = 0; j < BigInt::base_char; ++j) {
+				cstring.push_back(rev[(ch & (T))]);
+				ch = ch >> 4;
+			}
+		}
+
+		if (cstring[0] == 15) { // 'f'
+			cstring[0] = 0;
+			cstring[1] += 1;
+		} else if (cstring[0] == 9) { // '9'
+			cstring[0] = 10; // 'a'
+		} else {
+			cstring[0] += 1;
+		}
+
+	} else {
+		for (BigInt::data_t::const_iterator it = _data.begin(); it != _data.end(); ++it) {
+			BigInt::base_t ch = (*it);
+			for (int j = 0; j < BigInt::base_char; ++j) {
+				cstring.push_back(hex[ch & (T)]);
+				ch = ch >> 4;
+			}
+		}
+	}
+
+	reverse(cstring.begin(), cstring.end());
+
+	// BASE16 -> BASE256
+	const uint32_t count = 8;
+	const uint32_t f8 = cstring.size() / count;
+	const uint32_t r8 = cstring.size() % count;
+
+	std::string result = "";
+	for (uint32_t i = 0; i < f8; ++i) {
+		uint8_t character = 0;
+		for (int j = 0; j < count; ++j) {
+			character += cstring[(i * count) + j];
+		}
+		result += character;
+	}
+
+	return result;
 }
 
 BigInt operator <<(const BigInt& a,unsigned int n)
