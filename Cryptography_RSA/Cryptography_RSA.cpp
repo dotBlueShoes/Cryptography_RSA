@@ -1,10 +1,11 @@
 ﻿#include "inc/Framework.hpp"
 #include "inc/Window.hpp"
 #include "inc/AES/main.hpp"
+#include "inc/RSA/Test.hpp"
 
 // Globals
 const wchar classNameMainWindow[] = L"MainWindow",
-titleMainWindow[] = L"AES 242422 242539";
+titleMainWindow[] = L"RSA 242422 242539";
 
 int32 APIENTRY wWinMain(
     IN          HINSTANCE process,
@@ -25,6 +26,10 @@ int32 APIENTRY wWinMain(
 
         Window::MyRegisterClass(process, classNameMainWindow);
         if (!Window::InitInstance(process, nCmdShow, classNameMainWindow, titleMainWindow, windowPosition, windowArea)) return FALSE;
+
+        {
+
+        }
 
         /* { // TESTS
 

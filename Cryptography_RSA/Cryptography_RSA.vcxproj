@@ -128,11 +128,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Cryptography_RSA.h" />
+    <ClInclude Include="inc\BigInteger\BigInt.hpp" />
+    <ClInclude Include="inc\RSA\RSA.hpp" />
+    <ClInclude Include="inc\RSA\Test.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cryptography_RSA.cpp" />
+    <ClCompile Include="inc\BigInteger\BigInt.cpp" />
+    <ClCompile Include="inc\RSA\RSA.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Cryptography_RSA.rc" />

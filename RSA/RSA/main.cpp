@@ -1,22 +1,17 @@
 #include<iostream>
 #include<ctime>
-#include"BigInt.h"
-#include"Rsa.h"
 
+#include"RSA.hpp"
 
-using std::cout;
-using std::endl;
-using std::cin;
-
-void menu()
-{
-	cout<<"==========Welcome to use RSA encoder=========="<<endl;
-	cout<<"               e.encrypt 加密              "<<endl;
-	cout<<"               d.decrypt 解密              "<<endl;
-	cout<<"               s.setkey 重置               "<<endl;
-	cout<<"               p.print 显示               "<<endl;
-	cout<<"               q.quit 退出                 "<<endl;
-	cout<<"input your choice:"<<endl;
+void menu() {
+	std::cout <<
+		"\nRSA program:\n"
+		"\te.encrypt\n"
+		"\td.decrypt\n"
+		"\ts.setkey\n"
+		"\tp.print\n"
+		"\tq.quit\n"
+		"input your choice: ";
 }
 
 bool islegal(const string& str) {
@@ -28,115 +23,123 @@ bool islegal(const string& str) {
 	return true;
 }
 
-bool decode(Rsa& rsa) {
-	string str;
+bool decrypt(RSA& rsa) {
+	string input;
 
 	do {
-		cout << ">输入16进制数据:";
-		cin >> str;
-	} while (cin && str.length() < 1);
+		std::cout << "Encrypted Message: ";
+		std::cin >> input;
+	} while (std::cin && input.length() < 1);
 
-	if (!cin || islegal(str) == false)
+	if (!std::cin || islegal(input) == false)
 		return false;
 
-	BigInt c(str);
+	BigInt encryptedMessage(input);
 	
 	long t1 = clock();
-	BigInt m = rsa.decodeByPr(c);
+	BigInt decryptedMessage = rsa.DecryptByPr(encryptedMessage);
+
 	long t2 = clock();
 
-	cout << "用时:" << (t2 - t1) << "ms." << endl;
-	cout << "密文:" << c << '\n' << "明文:" << m << endl;
+	std::cout << "Decryption Time: " << (t2 - t1) << "ms." << std::endl;
+	std::cout << "Encrypted Message: " << encryptedMessage << '\n'
+		<< "Decrypted Message: " << decryptedMessage << std::endl;
 
 	return true;
 }
 
-bool encry(Rsa& rsa,BigInt& c) {
-	string str;
+bool encrypt(RSA& rsa) {
+	string input;
 
 	do {
-		cout << ">输入16进制数据:";
-		cin >> str;
-	} while (cin && str.length() < 1);
+		std::cout << "Nocrypted Message: ";
+		std::cin >> input;
+	} while (std::cin && input.length() < 1);
 
-	if (!cin || islegal(str) == false)
+	if (!std::cin || islegal(input) == false)
 		return false;
 
-	BigInt m(str);
+	BigInt nocryptedMessage(input);
 
-	c = rsa.encryptByPu(m);
+	BigInt encryptedMessage = rsa.EncryptByPu(nocryptedMessage);
 
-	cout << "明文:" << m << '\n' << "密文:" << c << endl;
+	std::cout << "NOCRYPTED: " << nocryptedMessage << '\n'
+		<< "ENCRYPTED: " << encryptedMessage << std::endl;
 
 	return true;
 }
 
-void print(Rsa& rsa) {
-	cout << rsa << endl;
+void print(RSA& rsa) {
+	std::cout << rsa << std::endl;
 }
 
-void init(Rsa& rsa, int n) {
-	cout << "初始化...."<< endl;
+void initialize(RSA& rsa, int keyLength) {
+	std::cout << "Creating Key...."<< std::endl;
 	long t1 = clock();
-	rsa.init(n);
+	rsa.Initialize(keyLength);
+
 	long t2 = clock();
-	cout << "初始化完成." << endl;
-	cout << "用时:" << (t2-t1) / 1000 << "s." << endl;
+	std::cout << "Key Created." << std::endl;
+	std::cout << "Creation Time: " << (t2 - t1) / 1000 << "s." << std::endl;
 }
 
-int go()
-{
-	char ch;
-	string str;
-	Rsa rsa;
-	BigInt c,m;
-	cout<<"输入位数:";
-	int n;
-	cin >> n;
+int loop() {
 
-	init(rsa, n/2);
+	char processedInput;
+	string input;
+	RSA rsa;
+	BigInt c, m;
+	int keyLength;
 
-	while(true)
-	{
+	std::cout << "Key Length: ";
+	std::cin >> keyLength;
+
+	initialize(rsa, keyLength / 2);
+
+	while (true) {
+
 		menu();
-		cout<<">";
-		cin>>str;
-		if(!cin)
+		std::cin >> input;
+
+		if(!std::cin)
 			return 0;
 		
-		if(str.length()<1)
-			cout<<"重新输入"<<endl;
-		else
-		{
-			ch=str.at(0);
-			switch(ch)
-			{
-			case 'e':
-			case 'E':
-				encry(rsa,c);
-				break;
-			case 'd':
-			case 'D':
-				decode(rsa);
-				break;
-			case 's':
-			case 'S':
-				go();
-				break;
-			case 'p':
-			case 'P':
-				print(rsa);
-				break;
-			case 'q':
-			case 'Q':
-				return 0;
+		if (input.length() < 1)
+			std::cout << "Invalid Read Input!" << std::endl;
+		else {
+			processedInput = input.at(0);
+			switch(processedInput) {
+				case 'e':
+				case 'E': {
+					encrypt(rsa);
+				} break;
+
+				case 'd':
+				case 'D': {
+					decrypt(rsa);
+				} break;
+
+				case 's':
+				case 'S': {
+					loop();
+				} break;
+
+				case 'p':
+				case 'P': {
+					print(rsa);
+				} break;
+				
+				case 'q':
+				case 'Q':
+				default: {
+					return 0;
+				}
 			}
 		}
 	}
 }
 
 
-int main()
-{
-	go();
+int main() {
+	loop();
 }

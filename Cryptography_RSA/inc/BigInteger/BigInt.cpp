@@ -1,6 +1,6 @@
-#include"BigInt.hpp"
+#include "BigInt.hpp"
 
-#include<cassert>
+#include <cassert>
 
 int BigInt::base_char=8;
 int BigInt::base=0xFFFFFFFF;

@@ -76,13 +76,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="BigInt.h" />
-    <ClInclude Include="Rsa.h" />
+    <ClInclude Include="BigInt.hpp" />
+    <ClInclude Include="RSA.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BigInt.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Rsa.cpp" />
+    <ClCompile Include="RSA.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

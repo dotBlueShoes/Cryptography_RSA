@@ -15,15 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Rsa.h">
+    <ClInclude Include="RSA.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="BigInt.h">
+    <ClInclude Include="BigInt.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Rsa.cpp">
+    <ClCompile Include="RSA.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="BigInt.cpp">

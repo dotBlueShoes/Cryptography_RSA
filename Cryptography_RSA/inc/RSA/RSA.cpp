@@ -15,8 +15,8 @@ void RSA::Initialize(unsigned int keyLength) {
 	q = CreatePrime(keyLength, 10);
 	N = p * q;
 
-	_ol = (p - 1) * (q - 1);
-	CreateExponent(_ol);
+	phi = (p - 1) * (q - 1);
+	CreateExponent(phi);
 }
 
 BigInt RSA::CreateOddNumber(unsigned int keyLength) {

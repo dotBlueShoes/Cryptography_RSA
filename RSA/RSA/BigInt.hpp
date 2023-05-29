@@ -1,9 +1,11 @@
 #pragma once
+
 #include<vector>
 #include<string>
 #include<cassert>
 #include<iostream>
 #include <algorithm>
+
 using std::ostream;
 using std::vector;
 using std::string;
@@ -19,12 +21,7 @@ public:
 	static int basebitchar;
 	static int basebit;
 
-private:
-
 	friend class Rsa;
-	friend void test();
-
-public:	
 
 	friend BigInt operator + (const BigInt& a,const BigInt& b);
 	friend BigInt operator - (const BigInt& a,const BigInt& b);
@@ -46,8 +43,6 @@ public:
 	friend bool operator != (const BigInt& a,const long b){BigInt t(b);return !(a==t);};	
 	friend ostream& operator << (ostream& out,const BigInt& a); 	
 	friend BigInt operator <<(const BigInt& a,unsigned int n);
-
-public:
 
 	typedef vector<base_t> data_t;
 	typedef const vector<base_t> const_data_t;	
@@ -85,7 +80,6 @@ public:
 	BigInt moden(const BigInt& exp,const BigInt& p)const;	
 	BigInt extendEuclid(const BigInt& m);
 
-public:	
 	BigInt() : _isnegative(false) { _data.push_back(0); }
 
 	BigInt(const string& num) : _data() , _isnegative(false) { copyFromHexString(num);trim(); }
@@ -109,13 +103,9 @@ public:
 		return *this;
 	}
 
-public:	
-
 	static BigInt Zero;
 	static BigInt One;
 	static BigInt Two;
-
-private:
 
 	bool smallThan(const BigInt& a) const;
 	bool smallOrEquals(const BigInt& a) const;
@@ -157,6 +147,7 @@ private:
 		}
 		reverse(_data.begin(), _data.end());
 	}
+
 	char hex2Uchar(char ch) {
 
 		static char table[] = { 
@@ -194,7 +185,6 @@ private:
 
 	static void div(const BigInt& a,const BigInt& b,BigInt& result,BigInt& ca);
 
-private:	
 	vector<base_t> _data;
 	bool _isnegative;
 
