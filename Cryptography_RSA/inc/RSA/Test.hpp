@@ -9,6 +9,8 @@
 namespace Tests {
 
 	RSA rsa;
+	std::vector<bool> negation1;
+	std::vector<bool> negation2;
 
 	block Initialize(RSA& rsa, const uint64& keyLength) {
 		uint64 t1, t2;
@@ -34,7 +36,7 @@ namespace Tests {
 			std::ofstream outputFile(decodedFilePath, std::ios::binary);
 
 			// Likely uses the result of the division - single DIV instruction.
-			const uint64 blockSize = 8;
+			const uint64 blockSize = 4 * 2;
 			const uint64 blocksCount = (uint64)readData.size() / blockSize;
 			const uint64 lastBlock = blocksCount - 1;
 			//const uint64 leftBytesCount = readData.size() % blockSize;
@@ -72,12 +74,15 @@ namespace Tests {
 					temp += character;
 				}
 
-				MessageBoxA(nullptr, temp.c_str(), "DEBUG A", MB_OK);
+				//MessageBoxA(nullptr, temp.c_str(), "DEBUG A", MB_OK);
 
 				BigInt encrypted(temp);
 				BigInt decrypted = rsa.DecryptByPr(encrypted);
 
-				std::string result = decrypted.toString(encrypted._isnegative);
+				//std::string result = decrypted.toString(encrypted._isnegative);
+				std::string result = decrypted.toString(negation1.back());
+				negation1.pop_back();
+
 				for (size j = 0; j < result.size(); ++j) {
 					byte t = result[j];
 					outputFile << t;
@@ -85,8 +90,8 @@ namespace Tests {
 
 				//outputFile << decrypted.toString();
 
-				MessageBoxA(nullptr, encrypted.toString().c_str(), "DEBUG B", MB_OK);
-				MessageBoxA(nullptr, decrypted.toString().c_str(), "DEBUG C", MB_OK);
+				//MessageBoxA(nullptr, encrypted.toString().c_str(), "DEBUG B", MB_OK);
+				//MessageBoxA(nullptr, decrypted.toString().c_str(), "DEBUG C", MB_OK);
 			}
 
 			// LAST BLOCK
@@ -119,7 +124,10 @@ namespace Tests {
 				BigInt encrypted(temp);
 				BigInt decrypted = rsa.DecryptByPr(encrypted);
 
-				std::string result = decrypted.toString(encrypted._isnegative);
+				//std::string result = decrypted.toString(encrypted._isnegative);
+				std::string result = decrypted.toString(negation1.back());
+				negation1.pop_back();
+				
 				for (size j = 0; j < result.size(); ++j) {
 					byte t = result[j];
 					outputFile << t;
@@ -153,13 +161,15 @@ namespace Tests {
 					temp += character;
 				}
 
-				MessageBoxA(nullptr, temp.c_str(), "DEBUG A", MB_OK);
+				//MessageBoxA(nullptr, temp.c_str(), "DEBUG A", MB_OK);
 
 				BigInt encrypted(temp);
 				BigInt decrypted = rsa.DecryptByPr(encrypted);
 
 				// Trim 0's
-				std::string r = decrypted.toHexString(encrypted._isnegative).substr(8 - (bytesLeftCount * 2));
+				//std::string r = decrypted.toHexString(encrypted._isnegative).substr(8 - (bytesLeftCount * 2));
+				std::string r = decrypted.toHexString(negation1.back()).substr(8 - (bytesLeftCount * 2));
+				negation1.pop_back();
 
 				// Convert from 16*16 format to 256 format
 				std::string final = "";
@@ -183,15 +193,15 @@ namespace Tests {
 					final += charFinal;
 				}
 
-				MessageBoxA(nullptr, encrypted.toString().c_str(), "DEBUG B", MB_OK);
-				MessageBoxA(nullptr, r.c_str(), "DEBUG C", MB_OK);
+				//MessageBoxA(nullptr, encrypted.toString().c_str(), "DEBUG B", MB_OK);
+				//MessageBoxA(nullptr, r.c_str(), "DEBUG C", MB_OK);
 
 				for (size j = 0; j < final.size(); ++j) {
 					byte t = final[j];
 					outputFile << t;
 				}
 
-				MessageBoxA(nullptr, final.c_str(), "DEBUG D", MB_OK);
+				//MessageBoxA(nullptr, final.c_str(), "DEBUG D", MB_OK);
 
 				//bytesLeftCount
 			}
@@ -244,6 +254,7 @@ namespace Tests {
 			std::vector<byte> readData(FileIO::Read::File(nocodedFilePath));
 			std::ofstream outputFile(encodedFilePath, std::ios::binary);
 
+			negation1.clear();
 			// 256 nocrypted -> 256 encrypted
 			// 1. nocrypted -> base16 format
 			// 2. process on base16
@@ -299,10 +310,12 @@ namespace Tests {
 			
 				BigInt nocrypted(message);
 				BigInt encrypted = rsa.EncryptByPu(nocrypted);
-				MessageBoxA(nullptr, nocrypted.toString().c_str(), "DEBUG A", MB_OK);
-				MessageBoxA(nullptr, encrypted.toString(nocrypted._isnegative).c_str(), "DEBUG B", MB_OK);
-				outputFile << encrypted.toString(nocrypted._isnegative);
-				//outputFile << encrypted.toString();
+				//MessageBoxA(nullptr, nocrypted.toString().c_str(), "DEBUG A", MB_OK);
+				//MessageBoxA(nullptr, encrypted.toString(nocrypted._isnegative).c_str(), "DEBUG B", MB_OK);
+				//outputFile << encrypted.toString(nocrypted._isnegative);
+				outputFile << encrypted.toString();
+
+				negation1.push_back(nocrypted._isnegative);
 			}
 			
 			if (bytesLeftCount != 0) { // FOR BLOCK LEFT
@@ -314,11 +327,14 @@ namespace Tests {
 			
 				BigInt nocrypted(message);
 				BigInt encrypted = rsa.EncryptByPu(nocrypted);
-				MessageBoxA(nullptr, encrypted.toString().c_str(), "DEBUG B", MB_OK);
-				outputFile << encrypted.toString(nocrypted._isnegative);
-				//outputFile << encrypted.toString();
+				//MessageBoxA(nullptr, encrypted.toString().c_str(), "DEBUG B", MB_OK);
+				//outputFile << encrypted.toString(nocrypted._isnegative);
+				outputFile << encrypted.toString();
+
+				negation1.push_back(nocrypted._isnegative);
 			}
 
+			std::reverse(negation1.begin(), negation1.end());
 			outputFile.close();
 		}
 	}
