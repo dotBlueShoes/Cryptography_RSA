@@ -301,8 +301,8 @@ namespace Tests {
 				BigInt encrypted = rsa.EncryptByPu(nocrypted);
 				MessageBoxA(nullptr, nocrypted.toString().c_str(), "DEBUG A", MB_OK);
 				MessageBoxA(nullptr, encrypted.toString(nocrypted._isnegative).c_str(), "DEBUG B", MB_OK);
-				outputFile << encrypted.toString(nocrypted._isnegative);
-				//outputFile << encrypted.toString();
+				//outputFile << encrypted.toString(nocrypted._isnegative);
+				outputFile << encrypted.toString();
 			}
 			
 			if (bytesLeftCount != 0) { // FOR BLOCK LEFT
@@ -315,8 +315,8 @@ namespace Tests {
 				BigInt nocrypted(message);
 				BigInt encrypted = rsa.EncryptByPu(nocrypted);
 				MessageBoxA(nullptr, encrypted.toString().c_str(), "DEBUG B", MB_OK);
-				outputFile << encrypted.toString(nocrypted._isnegative);
-				//outputFile << encrypted.toString();
+				//outputFile << encrypted.toString(nocrypted._isnegative);
+				outputFile << encrypted.toString();
 			}
 
 			outputFile.close();

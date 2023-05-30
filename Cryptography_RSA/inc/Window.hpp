@@ -308,51 +308,8 @@ namespace Window {
         SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
 
         { // PROCESS
-
             Tests::RSAN::ReadEncodeWrite(aesBytesLeftPath, inputPathBuffor, outputPathBuffor, 32);
             MessageBox(nullptr, L"Succefully Encrypted [32]", LOG_TYPE, MB_OK);
-
-            //switch (Windows::MainTab::tabState) {
-
-               // default:
-               // case Windows::MainTab::AES_128: {
-               //     AES::Key128 key { 0 };
-               //     AES::WcharsToKey(key, keyBuffor, keyValueLength);
-               //
-               //     if (keyValueLength > 8) { // eg. 16 bytes
-               //         MessageBox(nullptr, L"Key value is to long! Max 8 signs for Key128!", LOG_TYPE, MB_OK);
-               //         return;
-               //     }
-
-                    
-                //} break;
-
-                //case Windows::MainTab::AES_192: {
-                //    AES::Key192 key { 0 };
-                //    AES::WcharsToKey(key, keyBuffor, keyValueLength);
-                //
-                //    if (keyValueLength > 12) { // eg. 24 bytes
-                //        MessageBox(nullptr, L"Key value is to long! Max 12 signs for Key192!", LOG_TYPE, MB_OK);
-                //        return;
-                //    }
-                //
-                //    AES::ReadEncodeWrite<AES::Key192>(aesBytesLeftPath, inputPathBuffor, outputPathBuffor, key);
-                //    MessageBox(nullptr, L"Succefully Encrypted [192]", LOG_TYPE, MB_OK);
-                //} break;
-                //
-                //case Windows::MainTab::AES_256: {
-                //    AES::Key256 key { 0 };
-                //    AES::WcharsToKey(key, keyBuffor, keyValueLength);
-                //
-                //    if (keyValueLength > 16) { // eg. 32 bytes
-                //        MessageBox(nullptr, L"Key value is to long! Max 16 signs for Key256!", LOG_TYPE, MB_OK);
-                //        return;
-                //    }
-                //
-                //    AES::ReadEncodeWrite<AES::Key256>(aesBytesLeftPath, inputPathBuffor, outputPathBuffor, key);
-                //    MessageBox(nullptr, L"Succefully Encrypted [256]", LOG_TYPE, MB_OK);
-                //}
-
         }
 
         delete[] inputPathBuffor;
@@ -382,49 +339,8 @@ namespace Window {
         SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
 
         { // PROCESS
-            switch (Windows::MainTab::tabState) {
-
-                default:
-                case Windows::MainTab::AES_128: {
-                    AES::Key128 key { 0 };
-                    AES::WcharsToKey(key, keyBuffor, keyValueLength);
-
-                    if (keyValueLength > 8) { // eg. 16 bytes
-                        MessageBox(nullptr, L"Key value is to long! Max 8 signs for Key128!", LOG_TYPE, MB_OK);
-                        return;
-                    }
-
-                    AES::ReadDecodeWrite<AES::Key128>(inputPathBuffor, outputPathBuffor, key, aesBytesLeftPath);
-                    MessageBox(nullptr, L"Succefully Decrypted [128]", LOG_TYPE, MB_OK);
-                } break;
-
-                case Windows::MainTab::AES_192: {
-                    AES::Key192 key { 0 };
-                    AES::WcharsToKey(key, keyBuffor, keyValueLength);
-
-                    if (keyValueLength > 12) { // eg. 24 bytes
-                        MessageBox(nullptr, L"Key value is to long! Max 12 signs for Key192!", LOG_TYPE, MB_OK);
-                        return;
-                    }
-
-                    AES::ReadDecodeWrite<AES::Key192>(inputPathBuffor, outputPathBuffor, key, aesBytesLeftPath);
-                    MessageBox(nullptr, L"Succefully Decrypted [192]", LOG_TYPE, MB_OK);
-                } break;
-
-                case Windows::MainTab::AES_256: {
-                    AES::Key256 key { 0 };
-                    AES::WcharsToKey(key, keyBuffor, keyValueLength);
-
-                    if (keyValueLength > 16) { // eg. 32 bytes
-                        MessageBox(nullptr, L"Key value is to long! Max 16 signs for Key256!", LOG_TYPE, MB_OK);
-                        return;
-                    }
-
-                    AES::ReadDecodeWrite<AES::Key256>(inputPathBuffor, outputPathBuffor, key, aesBytesLeftPath);
-                    MessageBox(nullptr, L"Succefully Decrypted [256]", LOG_TYPE, MB_OK);
-                }
-
-            }
+            Tests::RSAN::ReadDecodeWrite(inputPathBuffor, outputPathBuffor, 32, aesBytesLeftPath);
+            MessageBox(nullptr, L"Succefully Decrypted [32]", LOG_TYPE, MB_OK);
         }
 
         delete[] inputPathBuffor;

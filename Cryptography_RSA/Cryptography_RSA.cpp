@@ -29,6 +29,31 @@ int32 APIENTRY wWinMain(
 
         {
             Tests::Key32();
+
+            //const uint8 mask = 0b0000'1111;
+            //std::string temp = "";
+            //uint8 sample = 0b1111'0001;
+            //char s1 = sample >> 4;
+            //
+            //if (s1 > 9) { // '9'
+            //    s1 += ('A' - 10); // 'a'
+            //} else {
+            //    s1 += '0';
+            //}
+            //temp += s1;
+            //
+            //s1 = sample & mask;
+            //
+            //if (s1 > 9) { // '9'
+            //    s1 += ('A' - 10); // 'a'
+            //} else {
+            //    s1 += '0';
+            //}
+            //temp += s1;
+            //
+            //temp += '\n';
+            //
+            //MessageBoxA(nullptr, temp.c_str(), "CORRECT", MB_OK);
         }
 
         /* { // TESTS

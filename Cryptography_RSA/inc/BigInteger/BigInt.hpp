@@ -96,7 +96,7 @@ public:
 		return *this;
 	}		
 
-	BigInt(const BigInt& a,bool isnegative) : _data(a._data), _isnegative(isnegative) {}		
+	BigInt(const BigInt& a, bool isnegative) : _data(a._data), _isnegative(isnegative) {}		
 	BigInt& operator =(const long n) {
 		_data.clear();
 		copyFromLong(n);
@@ -121,8 +121,10 @@ public:
 		string str(s);
 
 		if (str.length() && str.at(0) == '-') {
-			if(str.length()>1)
-				_isnegative=true;
+			if (str.length() > 1) {
+				_isnegative = true;
+				//MessageBoxA(nullptr, "A", "B", 0x00000000L);
+			}
 			str=str.substr(1);
 		}
 
@@ -173,6 +175,7 @@ public:
 
 		if (a < 0) {
 			_isnegative=true;
+			//MessageBoxA(nullptr, "A", "B", 0x00000000L);
 			a=-a;
 		} 
 
@@ -187,6 +190,7 @@ public:
 
 
 	std::wstring toWString(const bool& negate = false);
+	std::string toHexString(const bool& negate = false);
 	std::string toString(const bool& negate = false);
 
 	vector<base_t> _data;
