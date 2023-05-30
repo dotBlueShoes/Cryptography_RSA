@@ -36,7 +36,7 @@ namespace Tests {
 			std::ofstream outputFile(decodedFilePath, std::ios::binary);
 
 			// Likely uses the result of the division - single DIV instruction.
-			const uint64 blockSize = 4 * 2;
+			const uint64 blockSize = 4 * (key / 16);
 			const uint64 blocksCount = (uint64)readData.size() / blockSize;
 			const uint64 lastBlock = blocksCount - 1;
 			//const uint64 leftBytesCount = readData.size() % blockSize;
@@ -265,7 +265,7 @@ namespace Tests {
 			const uint64 blocksCount = (uint64)readData.size() / blockSize;
 			bytesLeftCount = readData.size() % blockSize;
 
-			//Initialize(rsa, 32); // key
+			Initialize(rsa, key); // key
 
 			//const uint8 mask = 0b0000'1111;
 			//std::ofstream outputFile(encodedFilePath, std::ios::binary);

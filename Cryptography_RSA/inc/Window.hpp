@@ -308,7 +308,9 @@ namespace Window {
         SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
 
         { // PROCESS
-            Tests::RSAN::ReadEncodeWrite(aesBytesLeftPath, inputPathBuffor, outputPathBuffor, 32);
+            uint32 key { 0 };
+            key = wcstol(keyBuffor, nullptr, 10);
+            Tests::RSAN::ReadEncodeWrite(aesBytesLeftPath, inputPathBuffor, outputPathBuffor, key);
             MessageBox(nullptr, L"Succefully Encrypted [32]", LOG_TYPE, MB_OK);
         }
 
@@ -339,7 +341,9 @@ namespace Window {
         SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
 
         { // PROCESS
-            Tests::RSAN::ReadDecodeWrite(inputPathBuffor, outputPathBuffor, 32, aesBytesLeftPath);
+            uint32 key { 0 }; 
+            key = wcstol(keyBuffor, nullptr, 10);
+            Tests::RSAN::ReadDecodeWrite(inputPathBuffor, outputPathBuffor, key, aesBytesLeftPath);
             MessageBox(nullptr, L"Succefully Decrypted [32]", LOG_TYPE, MB_OK);
         }
 
