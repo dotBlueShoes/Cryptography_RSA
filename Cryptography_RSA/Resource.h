@@ -1,6 +1,6 @@
 ﻿//{{NO_DEPENDENCIES}}
 // Plik dołączany wygenerowany przez program Microsoft Visual C++.
-// Używane przez: Cryptography_RSA.rc
+// Używane przez: Cryptography_AES.rc
 
 #define IDS_APP_TITLE			103
 
