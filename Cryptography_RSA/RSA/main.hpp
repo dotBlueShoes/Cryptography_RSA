@@ -51,16 +51,22 @@ namespace RSA {
 		return (p - 1) * (q - 1);
 	}
 
-	block CalculateE(
+	block NumCalculateE(
 		IN const Num& phi
 	) {
-		Num e = 2;
+		Num e = 3;
 
-		while (e < phi) {
-			Num temp = GreatestCommonDivisor(e, phi);
-			if (temp == Num(1)) break;
-			else e += 1;
-		}
+		//while (e < phi) {
+		//	Num temp = GreatestCommonDivisor(e, phi);
+		//	if (temp == Num(1)) break;
+		//	else e += 2;
+		//}
+
+		while (e.gcd(e, phi) != 1) e+= 2;
+
+		//while (GreatestCommonDivisor(e, phi) != 1) e += 2;
+		// TERMINATE IF E IS >= PHI
+		if (e >= phi) exit(-1);
 
 		return e;
 	}
@@ -328,22 +334,41 @@ namespace RSA {
 
 		std::vector<char> buffor;
 		
-
 		//1024b
 		//1024b
 		//2048b
 
 		// p, q, n, phi, e, d
-		Num p = "257422187763775188257134387231", q = "268704472480766259262399638409";
+		
+		//Num p = "257422187763775188257134387231", q = "268704472480766259262399638409";
+
+		// 128bit
+		//Num p = "340282366920938463463374607432841953291";
+		//Num q = "340282366920938463463374607431768212629";
+
+		// 256bit
+		//Num p = "115792089237316195423570985008687907853269984665640564039457584007913130688523";
+		//Num q = "115792089237316195423570985008687907853269984665640564039457584007914203382263";
+
+		// 512bit
+		//Num p = "13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084171";
+		//Num q = "13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649007132903";
+
+		// 1024bit
+		Num p = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110541037861746687625057982134295314586803117506495636454552132846092481";
+		Num q = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540932549455019067871284216267630916370798611400235905440878535115721";
+
+		//Num p = "109", q = "163"; // works
+		//Num p = "3", q = "11";
 		Num n = p * q;
 		Num phi = CalculatePhi(p, q);
-		Num e = CalculateE(phi);		// encryption
+		Num e = NumCalculateE(phi);		// encryption
 		Num d = CalculateD(phi, e);		// decryption
 
 		//e.print(buffor);
 		//MessageBoxA(nullptr, buffor.data(), "LOGGER E", MB_OK);
 
-		Num nocrypted = 59;//0b0000'1111;
+		Num nocrypted = 53; //"257422187763775188257134387232"; //0b0000'1111;
 		//nocrypted.set_neg(false);
 		//nocrypted.neg = false;
 
@@ -364,8 +389,8 @@ namespace RSA {
 		//decrypted.neg = false;
 		//decrypted != decrypted;
 
-		//decrypted.print(buffor);
-		//MessageBoxA(nullptr, buffor.data(), "LOGGER DECRYPTED", MB_OK);
+		decrypted.print(buffor);
+		MessageBoxA(nullptr, buffor.data(), "LOGGER DECRYPTED", MB_OK);
 
 		if (decrypted == nocrypted)
 			MessageBoxW(nullptr, L"YES", L"LOGGER FINAL", MB_OK);

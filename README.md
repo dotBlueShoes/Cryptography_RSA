@@ -13,3 +13,6 @@ BIGINT LIBS
 - https://github.com/dandclark/BigInt
 - https://github.com/faheel/BigInt
 - https://github.com/983/bigint - this
+
+
+Szanowny Panie Doktorze, Niestety ja i mój kolega z grupy nie jesteśmy w stanie oddać zaległego zadania 'RSA' na dzisiejsze zajęcia, ponieważ jesteśmy jedyną grupą, która nie oddała jeszcze tego zadania chciałem zapytać czy mamy przyjść na dzisiejsze zajęcia (wtorek 13.06.2023)
