@@ -409,6 +409,48 @@ namespace RSA {
 
 	}
 
+	block WcharsToUint64(
+		OUT uint64& result,
+		IN const wchar* data, 
+		IN const size& dataCount = 4,
+		IN const size& offset = 0
+	) {
+		result = data[offset];		// 16bits
+		
+
+		for (size i = 1; i < dataCount; ++i) {
+			result <<= 16;
+			result += data[offset + i];
+		}
+		
+		//result <<= 16;
+		//result += data[offset + 1];	// 32bits
+		//result <<= 16;
+		//result += data[offset + 2];	// 48bits
+		//result <<= 16;
+		//result += data[offset + 3];	// 64bits
+	}
+
+	block Uint64ToWchars(
+		OUT std::vector<wchar_t>& result,
+		IN const uint64& data,
+		IN const size& dataCount = 4
+	) {
+		wchar_t temp = data >> 48;
+		result.push_back(temp);
+
+		for (size i = 1; i < dataCount; ++i) {
+			temp = (data << (16 * i)) >> 48;
+			result.push_back(temp);
+		}
+
+		
+		//temp = (data << 32) >> 48;
+		//result.push_back(temp);
+		//temp = (data << 48) >> 48;
+		//result.push_back(temp);
+	}
+
 	block Test4() {
 
 		std::vector<char> buffor;
@@ -436,6 +478,10 @@ namespace RSA {
 		// 1024bit
 		Num p = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110541037861746687625057982134295314586803117506495636454552132846092481";
 		Num q = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540932549455019067871284216267630916370798611400235905440878535115721";
+		
+		size nBitLength = 2048; // 1024 + 1024
+		// 2048 / 16 = 128
+		// czyli 1 block = 127 wcharów
 
 		//Num p = "109", q = "163"; // works
 		//Num p = "3", q = "11";
@@ -448,64 +494,46 @@ namespace RSA {
 		//MessageBoxA(nullptr, buffor.data(), "LOGGER E", MB_OK);
 
 		std::vector<wchar_t> inputData; // 16bit datatype
-		inputData.push_back(L'S');
-		inputData.push_back(L'A');
-		inputData.push_back(L'M');
+		//inputData.push_back(L'S');
+		//inputData.push_back(L'A');
+		//inputData.push_back(L'M');
+		for (size i = 0; i < 126; ++i) {
+			inputData.push_back(L'S');
+		}
 		inputData.push_back(L'\0');
 		//inputData.push_back(L'L');
 		//inputData.push_back(L'E');
 
 		// WCHAR TO UINT64
-		uint64 tempAdapter = inputData[0];	// 16bits
-		tempAdapter <<= 16;
-		tempAdapter += inputData[1];		// 32bits
-		tempAdapter <<= 16;
-		tempAdapter += inputData[2];		// 48bits
-		tempAdapter <<= 16;
-		tempAdapter += inputData[3];		// 64bits
+		uint64 tempAdapter = 0;
+		WcharsToUint64(tempAdapter, inputData.data());
 
 		std::vector<Num::word> words; // 64bit datatype
 		words.push_back(tempAdapter);
 		Num nocrypted(words.begin()._Ptr, words.end()._Ptr);
-
-		//std::string sample = "wololololo";
-		//Num nocrypted(sample.front(), 10, sample.back());
-
 		//Num nocrypted = 53; //"257422187763775188257134387232"; //0b0000'1111;
-		//nocrypted.set_neg(false);
-		//nocrypted.neg = false;
 
 		//nocrypted.print(buffor);
 		//MessageBoxA(nullptr, buffor.data(), "LOGGER NOCRYPTED", MB_OK);
 
 		// ENCRYPTION
 		Num encrypted = nocrypted.mod_pow(e, n);
-		//encrypted.set_neg(false);
-		//encrypted.neg = false;
 
 		//encrypted.print(buffor);
 		//MessageBoxA(nullptr, buffor.data(), "LOGGER ENCRYPTED", MB_OK);
 
 		// DECRYPTION
 		Num decrypted = encrypted.mod_pow(d, n);
-		//decrypted.set_neg(false);
-		//decrypted.neg = false;
-		//decrypted != decrypted;
 
 		//decrypted.print(buffor);
 		//MessageBoxA(nullptr, buffor.data(), "LOGGER DECRYPTED", MB_OK);
 
 		// UINT64 TO WCHAR
 		std::vector<wchar_t> outputData;
-		auto& decryptedWord = decrypted.words[0];
-		wchar_t temp = decryptedWord >> 48;
-		outputData.push_back(temp);
-		temp = (decryptedWord << 16) >> 48;
-		outputData.push_back(temp);
-		temp = (decryptedWord << 32) >> 48;
-		outputData.push_back(temp);
-		temp = (decryptedWord << 48) >> 48;
-		outputData.push_back(temp);
+		for (size i = 0; i < decrypted.words.size(); ++i) {
+			Uint64ToWchars(outputData, decrypted.words[i]);
+		}
+		
 
 		MessageBoxW(nullptr, outputData.data(), L"LOGGER DATA", MB_OK);
 
