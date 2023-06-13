@@ -31,7 +31,7 @@ int32 APIENTRY wWinMain (
         // TESTS
         //RSA::Test1();
         //RSA::Test2();
-        RSA::Test3();
+        RSA::Test4();
 
         /* { // TESTS
 

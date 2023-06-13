@@ -368,7 +368,14 @@ namespace RSA {
 		//e.print(buffor);
 		//MessageBoxA(nullptr, buffor.data(), "LOGGER E", MB_OK);
 
-		Num nocrypted = 53; //"257422187763775188257134387232"; //0b0000'1111;
+		std::vector<Num::word> words;
+		words.push_back(53);
+		Num nocrypted(words.begin()._Ptr, words.end()._Ptr);
+
+		//std::string sample = "wololololo";
+		//Num nocrypted(sample.front(), 10, sample.back());
+
+		//Num nocrypted = 53; //"257422187763775188257134387232"; //0b0000'1111;
 		//nocrypted.set_neg(false);
 		//nocrypted.neg = false;
 
@@ -391,6 +398,116 @@ namespace RSA {
 
 		decrypted.print(buffor);
 		MessageBoxA(nullptr, buffor.data(), "LOGGER DECRYPTED", MB_OK);
+
+		if (decrypted == nocrypted)
+			MessageBoxW(nullptr, L"YES", L"LOGGER FINAL", MB_OK);
+		else
+			MessageBoxW(nullptr, L"NO", L"LOGGER FINAL", MB_OK);
+
+		//swprintf_s(buffor, L"%llu", decrypted);
+		//MessageBoxW(nullptr, buffor, L"LOGGER DECRYPTED", MB_OK);
+
+	}
+
+	block Test4() {
+
+		std::vector<char> buffor;
+
+		//1024b
+		//1024b
+		//2048b
+
+		// p, q, n, phi, e, d
+
+		//Num p = "257422187763775188257134387231", q = "268704472480766259262399638409";
+
+		// 128bit
+		//Num p = "340282366920938463463374607432841953291";
+		//Num q = "340282366920938463463374607431768212629";
+
+		// 256bit
+		//Num p = "115792089237316195423570985008687907853269984665640564039457584007913130688523";
+		//Num q = "115792089237316195423570985008687907853269984665640564039457584007914203382263";
+
+		// 512bit
+		//Num p = "13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084171";
+		//Num q = "13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649007132903";
+
+		// 1024bit
+		Num p = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110541037861746687625057982134295314586803117506495636454552132846092481";
+		Num q = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540932549455019067871284216267630916370798611400235905440878535115721";
+
+		//Num p = "109", q = "163"; // works
+		//Num p = "3", q = "11";
+		Num n = p * q;
+		Num phi = CalculatePhi(p, q);
+		Num e = NumCalculateE(phi);		// encryption
+		Num d = CalculateD(phi, e);		// decryption
+
+		//e.print(buffor);
+		//MessageBoxA(nullptr, buffor.data(), "LOGGER E", MB_OK);
+
+		std::vector<wchar_t> inputData; // 16bit datatype
+		inputData.push_back(L'S');
+		inputData.push_back(L'A');
+		inputData.push_back(L'M');
+		inputData.push_back(L'\0');
+		//inputData.push_back(L'L');
+		//inputData.push_back(L'E');
+
+		// WCHAR TO UINT64
+		uint64 tempAdapter = inputData[0];	// 16bits
+		tempAdapter <<= 16;
+		tempAdapter += inputData[1];		// 32bits
+		tempAdapter <<= 16;
+		tempAdapter += inputData[2];		// 48bits
+		tempAdapter <<= 16;
+		tempAdapter += inputData[3];		// 64bits
+
+		std::vector<Num::word> words; // 64bit datatype
+		words.push_back(tempAdapter);
+		Num nocrypted(words.begin()._Ptr, words.end()._Ptr);
+
+		//std::string sample = "wololololo";
+		//Num nocrypted(sample.front(), 10, sample.back());
+
+		//Num nocrypted = 53; //"257422187763775188257134387232"; //0b0000'1111;
+		//nocrypted.set_neg(false);
+		//nocrypted.neg = false;
+
+		//nocrypted.print(buffor);
+		//MessageBoxA(nullptr, buffor.data(), "LOGGER NOCRYPTED", MB_OK);
+
+		// ENCRYPTION
+		Num encrypted = nocrypted.mod_pow(e, n);
+		//encrypted.set_neg(false);
+		//encrypted.neg = false;
+
+		//encrypted.print(buffor);
+		//MessageBoxA(nullptr, buffor.data(), "LOGGER ENCRYPTED", MB_OK);
+
+		// DECRYPTION
+		Num decrypted = encrypted.mod_pow(d, n);
+		//decrypted.set_neg(false);
+		//decrypted.neg = false;
+		//decrypted != decrypted;
+
+		//decrypted.print(buffor);
+		//MessageBoxA(nullptr, buffor.data(), "LOGGER DECRYPTED", MB_OK);
+
+		// UINT64 TO WCHAR
+		std::vector<wchar_t> outputData;
+		auto& decryptedWord = decrypted.words[0];
+		wchar_t temp = decryptedWord >> 48;
+		outputData.push_back(temp);
+		temp = (decryptedWord << 16) >> 48;
+		outputData.push_back(temp);
+		temp = (decryptedWord << 32) >> 48;
+		outputData.push_back(temp);
+		temp = (decryptedWord << 48) >> 48;
+		outputData.push_back(temp);
+
+		MessageBoxW(nullptr, outputData.data(), L"LOGGER DATA", MB_OK);
 
 		if (decrypted == nocrypted)
 			MessageBoxW(nullptr, L"YES", L"LOGGER FINAL", MB_OK);
