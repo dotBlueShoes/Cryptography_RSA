@@ -480,8 +480,11 @@ namespace RSA {
 		Num q = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540932549455019067871284216267630916370798611400235905440878535115721";
 		
 		size nBitLength = 2048; // 1024 + 1024
-		// 2048 / 16 = 128
-		// czyli 1 block = 127 wcharów
+		size blockSizeWchar = 124;
+		size blockSizeUint = 31;
+		// 2048 / 16 = 128 czyli 32 uint64
+		// czyli 1 block = 31 uint64
+		// czyli 1 block = 124 wchars
 
 		//Num p = "109", q = "163"; // works
 		//Num p = "3", q = "11";
@@ -494,22 +497,47 @@ namespace RSA {
 		//MessageBoxA(nullptr, buffor.data(), "LOGGER E", MB_OK);
 
 		std::vector<wchar_t> inputData; // 16bit datatype
+
+		std::string sample = "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123";
 		//inputData.push_back(L'S');
 		//inputData.push_back(L'A');
 		//inputData.push_back(L'M');
-		for (size i = 0; i < 126; ++i) {
-			inputData.push_back(L'S');
+		for (size i = 0; i < blockSizeWchar - 1; ++i) {
+			inputData.push_back(sample[i]);
 		}
 		inputData.push_back(L'\0');
 		//inputData.push_back(L'L');
 		//inputData.push_back(L'E');
 
-		// WCHAR TO UINT64
-		uint64 tempAdapter = 0;
-		WcharsToUint64(tempAdapter, inputData.data());
+		MessageBoxW(nullptr, inputData.data(), L"LOGGER INPUT DATA", MB_OK);
 
 		std::vector<Num::word> words; // 64bit datatype
-		words.push_back(tempAdapter);
+
+		for (size i = 0; i < blockSizeUint; ++i) {
+			uint64 tempAdapter = 0;
+			WcharsToUint64(tempAdapter, inputData.data(), 4, i * 4);
+			words.push_back(tempAdapter);
+		}
+
+		// 1.
+		// 0000 0000 0011 0001 
+		// 0000 0000 0011 0010 
+		// 0000 0000 0011 0011 
+		// 0000 0000 0011 0100
+
+		// 2.
+		// 0000 0000 0011 0010 
+		// 0000 0000 0011 0011 
+		// 0000 0000 0011 0100 
+		// 0000 0000 0011 0101
+
+		//MessageBoxW(nullptr, inputData.data() + (blockSize - 4), L"LOGGER INPUT DATA", MB_OK);
+
+		//// Last uint64
+		//uint64 tempAdapter = 0;
+		//WcharsToUint64(tempAdapter, inputData.data(), 4, blockSize - 4);
+		//words.push_back(tempAdapter);
+
 		Num nocrypted(words.begin()._Ptr, words.end()._Ptr);
 		//Num nocrypted = 53; //"257422187763775188257134387232"; //0b0000'1111;
 
@@ -533,6 +561,13 @@ namespace RSA {
 		for (size i = 0; i < decrypted.words.size(); ++i) {
 			Uint64ToWchars(outputData, decrypted.words[i]);
 		}
+
+		//Uint64ToWchars(outputData, decrypted.words[0]);
+		//Uint64ToWchars(outputData, decrypted.words[4]);
+		//Uint64ToWchars(outputData, decrypted.words[8]);
+
+		//// Last uint64
+		//Uint64ToWchars(outputData, decrypted.back(), 4);
 		
 
 		MessageBoxW(nullptr, outputData.data(), L"LOGGER DATA", MB_OK);
