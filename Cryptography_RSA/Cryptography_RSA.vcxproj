@@ -135,6 +135,7 @@
     <ClInclude Include="IO\FileIO.hpp" />
     <ClInclude Include="Framework.hpp" />
     <ClInclude Include="RSA\main.hpp" />
+    <ClInclude Include="RSA\RSA.hpp" />
     <ClInclude Include="Windows\Windows.hpp" />
     <ClInclude Include="Windows\MainTab.hpp" />
     <ClInclude Include="Resource.h" />

@@ -2,7 +2,9 @@
 #include "../Framework.hpp"
 
 #include "../IO/FileIO.hpp"
+#include "../RSA/RSA.hpp"
 #include "MainTab.hpp"
+
 #include <RichEdit.h>
 
 #define MSFTEDIT_DLL_PATH "Msftedit.dll" // a.k.a TextEdit 4.1
@@ -386,14 +388,14 @@ namespace Window {
         // OUTPUT BUFFOR NECESSITIES
         const uint64 inputBytesLength = inputLength * 2;
         const uint64 blocksCount = inputBytesLength / 16;
-        uint64 outputCount;
+        //uint64 outputCount;
 
-        if (inputBytesLength % 16 == 0)
-            outputCount = (blocksCount * 8);
-        else
-            outputCount = (blocksCount * 8) + 8;
+        //if (inputBytesLength % 16 == 0)
+        //    outputCount = (blocksCount * 8);
+        //else
+        //    outputCount = (blocksCount * 8) + 8;
         
-        wchar* outputBuffor = new wchar[outputCount + 1 /* null-termination*/];
+        wchar* outputBuffor = nullptr; // = new wchar[outputCount + 1 /* null-termination*/];
 
         // READ DATA
         SendMessageW(reInput, WM_GETTEXT, inputStringTerminationPosition, (LPARAM)inputBuffor);
@@ -404,29 +406,29 @@ namespace Window {
 
                 default:
                 case Windows::MainTab::RSA_256: {
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    RSA::Encrypt2048(outputBuffor, inputBuffor, inputLength, reOutput);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
+                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_1024: {
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
+                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_2048: {
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
+                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
                 }
 
             }
 
-            outputBuffor[outputCount] = L'\0';
-            SendMessageW(reOutput, WM_SETTEXT, NULL, (LPARAM)outputBuffor);
+            //outputBuffor[outputCount] = L'\0';
+            //SendMessageW(reOutput, WM_SETTEXT, NULL, (LPARAM)outputBuffor);
         }
 
         delete[] inputBuffor;
-        delete[] outputBuffor;
     }
 
     block OnButtonDecodeClick(
@@ -442,17 +444,17 @@ namespace Window {
         wchar* keyBuffor = new wchar[keyStringTerminationPosition];
 
         // OUTPUT BUFFOR NECESSITIES
-        const uint64 inputBytesLength = inputLength * 2;
-        const uint64 blocksCount = inputBytesLength / 16; 
+        //const uint64 inputBytesLength = inputLength * 2;
+        //const uint64 blocksCount = inputBytesLength / 16; 
         
-        uint64 outputCount;
+        //uint64 outputCount;
+        //
+        //if (aesWordsLeft == 0)
+        //    outputCount = (blocksCount * 8);
+        //else
+        //    outputCount = (blocksCount * 8) - (8 - aesWordsLeft);
 
-        if (aesWordsLeft == 0)
-            outputCount = (blocksCount * 8);
-        else
-            outputCount = (blocksCount * 8) - (8 - aesWordsLeft);
-
-        wchar* outputBuffor = new wchar[outputCount + 1 /* null-termination*/];
+        wchar* outputBuffor = nullptr; //new wchar[outputCount + 1 /* null-termination*/];
 
         // READ DATA
         SendMessageW(reOutput, WM_GETTEXT, inputStringTerminationPosition, (LPARAM)inputBuffor);
@@ -464,6 +466,7 @@ namespace Window {
                 default:
                 case Windows::MainTab::RSA_256: {
                     MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    RSA::Decrypt2048(outputBuffor, inputBuffor, inputLength, reInput);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
@@ -480,8 +483,8 @@ namespace Window {
 
             }
 
-            outputBuffor[outputCount] = L'\0';
-            SendMessageW(reInput, WM_SETTEXT, NULL, (LPARAM)outputBuffor);
+            //outputBuffor[outputCount] = L'\0';
+            //SendMessageW(reInput, WM_SETTEXT, NULL, (LPARAM)outputBuffor);
         }
 
         delete[] inputBuffor;
