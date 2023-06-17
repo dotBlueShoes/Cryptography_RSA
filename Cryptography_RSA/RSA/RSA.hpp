@@ -176,13 +176,44 @@ namespace RSA {
 		const uint64 length32Left = length % 32;
 
 		{ // FOR NOW DISPLAY IN MESSAGE BOXES !
-			for (size i = 0; i < 32; ++i) { // 47
+			for (size i = 0; i < 32; ++i) {
 				uint64 tempAdapter = 0;
 				WcharsToUint64(tempAdapter, inputBuffor, 4, i * 4);
 				//sprintf_s(buffor, 256, "%llu", tempAdapter);
 				//MessageBoxA(nullptr, buffor, "LOGGER ENCRYPTED", MB_OK);
 				words.push_back(tempAdapter);
 			}
+
+			encryptedBlocks.push_back(Num(words.begin()._Ptr, words.end()._Ptr));
+			words.clear();
+
+			for (size i = 0; i < 14; ++i) {
+				uint64 tempAdapter = 0;
+				WcharsToUint64(tempAdapter, inputBuffor, 4, (32 * 4) + (i * 4));
+				//sprintf_s(buffor, 256, "%llu", tempAdapter);
+				//MessageBoxA(nullptr, buffor, "LOGGER ENCRYPTED", MB_OK);
+				words.push_back(tempAdapter);
+			}
+
+			//std::cout << inputBuffor[(32 * 4) + (13 * 4)];
+			//std::cout << inputBuffor[(32 * 4) + (13 * 4) + 1];
+			//std::cout << inputBuffor[(32 * 4) + (13 * 4) + 2];
+
+			{ // last uint
+				uint64 tempAdapter = 0;
+				tempAdapter += inputBuffor[(32 * 4) + (14 * 4)];
+				tempAdapter <<= 16;
+				tempAdapter += inputBuffor[(32 * 4) + (14 * 4) + 1];
+				tempAdapter <<= 16;
+				tempAdapter += inputBuffor[(32 * 4) + (14 * 4) + 2];
+				//tempAdapter <<= 16;
+				//tempAdapter <<= 16;
+				//tempAdapter += inputBuffor[(32 * 4) + (13 * 4) + 3];
+				//WcharsToUint64(tempAdapter, inputBuffor, 3, (32 * 4) + (14 * 4));
+				words.push_back(tempAdapter);
+			}
+			
+			//words[14] >>= 16;
 			encryptedBlocks.push_back(Num(words.begin()._Ptr, words.end()._Ptr));
 			words.clear();
 		}
@@ -197,7 +228,23 @@ namespace RSA {
 			decryptedBlocks.push_back(decrypted);
 		}
 
-		decryptedBlocks.size();
+		//decryptedBlocks[decryptedBlocks.size() - 1].
+
+		// BIGINT into wchars
+		std::vector<wchar_t> outputData;
+		for (size i = 0; i < decryptedBlocks.size(); ++i) {
+			for (size j = 0; j < decryptedBlocks[i].words.size(); ++j) {
+				Uint64ToWchars(outputData, decryptedBlocks[i].words[j]);
+			}
+		}
+
+		//outputBuffor = new wchar[outputData.size()];
+		SendMessageW(output, WM_SETTEXT, NULL, (LPARAM)outputData.data());
+		delete[] outputBuffor;
+		
+		
+		// DEBUG
+		//MessageBoxW(nullptr, outputData.data(), L"LOGGER OUTPUT DATA", MB_OK);
 
 	}
 
@@ -287,7 +334,7 @@ namespace RSA {
 		}
 
 		
-		const auto encryptedWcharLength = encryptedLength * 4;
+		const auto encryptedWcharLength = encryptedLength * 4; // (32 + 15) * 4
 		outputBuffor = new wchar[encryptedWcharLength + 1]; /* null-termination */
 		
 		//const auto& length = encryptedBlocks[0].words.size();
@@ -350,6 +397,11 @@ namespace RSA {
 				lastWord <<= 16;
 				MessageBoxA(nullptr, "3", "LOGGER", MB_OK);
 			} 
+
+			uint64 sample = lastPos + (lastLength * 4);
+			Uint64ToWchars(outputBuffor, lastWord, sample);
+
+			// 1000'0000.1010'0111.1101'1100.1101'1001.0100'1010.1000'0010
 
 		//	const uint64 lastBlockSize = encryptedBlocks[lastBlock].size();
 		//	const uint64 lbs4 = lastBlockSize / 4;

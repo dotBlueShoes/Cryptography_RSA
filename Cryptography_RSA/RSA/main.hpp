@@ -146,4 +146,24 @@ namespace RSA {
 		//1 	MessageBoxW(nullptr, L"NO", L"LOGGER FINAL", MB_OK);
 	}
 
+
+	void BigIntTest() {
+		Num sample = "123456789012345678901234567890";
+		
+		for (size i = 0; i < sample.words.size(); ++i) {
+			sample.words[i];
+		}
+
+		sample.words[sample.words.size() - 1];
+
+		//Num(words.begin()._Ptr, words.end()._Ptr)
+		Num value(sample.words.begin()._Ptr, sample.words.end()._Ptr);
+		
+		for (size i = 0; i < value.words.size(); ++i) {
+			value.words[i];
+		}
+
+		value.words[value.words.size() - 1];
+	}
+
 }

@@ -29,6 +29,7 @@ int32 APIENTRY wWinMain (
         if (!Window::InitInstance(process, nCmdShow, classNameMainWindow, titleMainWindow, windowPosition, windowArea)) return FALSE;
 
         RSA::Test4();
+        //RSA::BigIntTest();
 
         /* { // TESTS
 

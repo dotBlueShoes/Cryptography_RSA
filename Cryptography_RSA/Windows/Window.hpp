@@ -406,8 +406,10 @@ namespace Window {
 
                 default:
                 case Windows::MainTab::RSA_256: {
-                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
-                    RSA::Encrypt2048(outputBuffor, inputBuffor, inputLength, reOutput);
+                    //MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
+                    //RSA::Encrypt2048(outputBuffor, inputBuffor, inputLength, reOutput);
+                    RSA::Encrypt2048(outputBuffor, inputData.data(), inputData.length(), reOutput);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
