@@ -194,12 +194,17 @@ namespace RSA {
 				words.clear();
 			}
 
-			for (size i = 0; i < length32Left; ++i) {
-				uint64 tempAdapter = 0;
-				WcharsToUint64(tempAdapter, inputBuffor, wcharsInUint64, (encodedBlockSizeUint * wcharsInUint64) + (i * wcharsInUint64));
-				//sprintf_s(buffor, 256, "%llu", tempAdapter);
-				//MessageBoxA(nullptr, buffor, "LOGGER ENCRYPTED", MB_OK);
-				words.push_back(tempAdapter);
+			if (length32Left) {
+				for (size i = 0; i < length32Left; ++i) {
+					uint64 tempAdapter = 0;
+					WcharsToUint64(tempAdapter, inputBuffor, wcharsInUint64, (encodedBlockSizeUint * wcharsInUint64) + (i * wcharsInUint64));
+					//sprintf_s(buffor, 256, "%llu", tempAdapter);
+					//MessageBoxA(nullptr, buffor, "LOGGER ENCRYPTED", MB_OK);
+					words.push_back(tempAdapter);
+				}
+
+				encryptedBlocks.push_back(Num(words.begin()._Ptr, words.end()._Ptr));
+				words.clear();
 			}
 
 			//std::cout << inputBuffor[(32 * 4) + (13 * 4)];
@@ -221,8 +226,7 @@ namespace RSA {
 			//1 }
 			
 			//words[14] >>= 16;
-			encryptedBlocks.push_back(Num(words.begin()._Ptr, words.end()._Ptr));
-			words.clear();
+			
 		}
 
 		// Last uint64 has to be moved by 16 bytes >> ...
@@ -237,9 +241,9 @@ namespace RSA {
 
 		//decryptedBlocks[decryptedBlocks.size() - 1].
 
-		// BIGINT into wchars
 		std::vector<wchar_t> outputData;
 		const uint64 lastDecryptedBlock = decryptedBlocks.size() - 1;
+		// for blocks
 		for (size i = 0; i < lastDecryptedBlock; ++i) {
 			for (size j = 0; j < decryptedBlocks[i].words.size(); ++j) {
 				Uint64ToWchars(outputData, decryptedBlocks[i].words[j]);
@@ -250,22 +254,58 @@ namespace RSA {
 			const uint64 lastDecryptedBlockWords = decryptedBlocks[lastDecryptedBlock].words.size() - 1;
 			// all words of last block except the very last one ...
 			for (size i = 0; i < lastDecryptedBlockWords; ++i) {
+
+				//const auto& tempValue = decryptedBlocks[lastDecryptedBlock].words[i];
+				//wchar tempChar = (wchar)(tempValue);
+				//
+				//for (int64 i = 4 - 1; i >= 0; --i) {
+				//	wchar tempChar = (wchar)(tempValue << (i * 16));
+				//	outputData.push_back(tempChar);
+				//}
+
 				Uint64ToWchars(outputData, decryptedBlocks[lastDecryptedBlock].words[i]);
 			}
 
-			{ // last word
-				//outputData.push_back(L'a');
-				const auto& tempValue = decryptedBlocks[lastDecryptedBlock].words[lastDecryptedBlockWords];
-				wchar tempChar = (wchar)(tempValue);
+			//if (length32Left) { // last word
+			//	//outputData.push_back(L'a');
 
-				for (int64 i = length32Left - 1; i >= 0; --i) {
+			// 4 ostatnie wchary....
+			// to mo¿e byæ 1/2/3/4 wchary
+			
+			uint64 masks[] {
+				0b0000'0000'0000'0000'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111,
+				0b0000'0000'0000'0000'0000'0000'0000'0000'1111'1111'1111'1111'1111'1111'1111'1111,
+				0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1111'1111'1111'1111,
+				//0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000,
+			};
+
+				auto& tempValue = decryptedBlocks[lastDecryptedBlock].words[lastDecryptedBlockWords];
+
+				size counter = 1; // 1 byte
+
+				if (tempValue > masks[0]) {			// 4byte'y
+					counter = 4;
+				} else if (tempValue > masks[1]) {	// 3byte'y
+					counter = 3;
+				} else if (tempValue > masks[2]) {	// 2byte'y
+					counter = 2;
+				} 
+
+				for (int64 i = counter - 1; i >= 0; --i) {
 					wchar tempChar = (wchar)(tempValue << (i * 16));
 					outputData.push_back(tempChar);
 				}
 
-				//Uint64ToWchars(outputData, decryptedBlocks[lastDecryptedBlock].words[lastDecryptedBlockWords], 1); // TAM JEST TO 50 !!!!
-				//outputData.push_back(L'a');
-			}
+			//	wchar tempChar = (wchar)(tempValue);
+			//
+			//	for (int64 i = length32Left - 1; i >= 0; --i) {
+			//		wchar tempChar = (wchar)(tempValue << (i * 16));
+			//		outputData.push_back(tempChar);
+			//	}
+			//
+			//	//Uint64ToWchars(outputData, decryptedBlocks[lastDecryptedBlock].words[lastDecryptedBlockWords], 1); // TAM JEST TO 50 !!!!
+			//	//outputData.push_back(L'a');
+			//}
 		}
 
 		outputData.push_back(L'\0');
