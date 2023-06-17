@@ -157,6 +157,7 @@ namespace RSA {
 		const size nBitLength = 2048; // 1024 + 1024
 		const size blockSizeWchar = 128 - 4;
 		const size blockSizeUint = 32 - 1;
+		const size encodedBlockSizeUint = 32;
 
 	}
 
@@ -171,25 +172,31 @@ namespace RSA {
 		std::vector<Num::word> words;
 		char buffor[256] { 0 };
 
-		const uint64 length = inputBufforLength / 4;
-		const uint64 length32 = length / 32;
-		const uint64 length32Left = length % 32;
+		const auto& encodedBlockSizeUint = RSA2048::encodedBlockSizeUint;
+
+		const uint64 length = inputBufforLength / wcharsInUint64;
+		const uint64 lengthLeft = inputBufforLength % wcharsInUint64;
+		const uint64 length32 = length / encodedBlockSizeUint;
+		const uint64 length32Left = length % encodedBlockSizeUint;
 
 		{ // FOR NOW DISPLAY IN MESSAGE BOXES !
-			for (size i = 0; i < 32; ++i) {
-				uint64 tempAdapter = 0;
-				WcharsToUint64(tempAdapter, inputBuffor, 4, i * 4);
-				//sprintf_s(buffor, 256, "%llu", tempAdapter);
-				//MessageBoxA(nullptr, buffor, "LOGGER ENCRYPTED", MB_OK);
-				words.push_back(tempAdapter);
+
+			for (size i = 0; i < length32; ++i) {
+				for (size j = 0; j < encodedBlockSizeUint; ++j) {
+					uint64 tempAdapter = 0;
+					WcharsToUint64(tempAdapter, inputBuffor, wcharsInUint64, (i * encodedBlockSizeUint) + (j * wcharsInUint64));
+					//sprintf_s(buffor, 256, "%llu", tempAdapter);
+					//MessageBoxA(nullptr, buffor, "LOGGER ENCRYPTED", MB_OK);
+					words.push_back(tempAdapter);
+				}
+
+				encryptedBlocks.push_back(Num(words.begin()._Ptr, words.end()._Ptr));
+				words.clear();
 			}
 
-			encryptedBlocks.push_back(Num(words.begin()._Ptr, words.end()._Ptr));
-			words.clear();
-
-			for (size i = 0; i < 14; ++i) {
+			for (size i = 0; i < length32Left; ++i) {
 				uint64 tempAdapter = 0;
-				WcharsToUint64(tempAdapter, inputBuffor, 4, (32 * 4) + (i * 4));
+				WcharsToUint64(tempAdapter, inputBuffor, wcharsInUint64, (encodedBlockSizeUint * wcharsInUint64) + (i * wcharsInUint64));
 				//sprintf_s(buffor, 256, "%llu", tempAdapter);
 				//MessageBoxA(nullptr, buffor, "LOGGER ENCRYPTED", MB_OK);
 				words.push_back(tempAdapter);
@@ -199,19 +206,19 @@ namespace RSA {
 			//std::cout << inputBuffor[(32 * 4) + (13 * 4) + 1];
 			//std::cout << inputBuffor[(32 * 4) + (13 * 4) + 2];
 
-			{ // last uint
-				uint64 tempAdapter = 0;
-				tempAdapter += inputBuffor[(32 * 4) + (14 * 4)];
-				tempAdapter <<= 16;
-				tempAdapter += inputBuffor[(32 * 4) + (14 * 4) + 1];
-				tempAdapter <<= 16;
-				tempAdapter += inputBuffor[(32 * 4) + (14 * 4) + 2];
-				//tempAdapter <<= 16;
-				//tempAdapter <<= 16;
-				//tempAdapter += inputBuffor[(32 * 4) + (13 * 4) + 3];
-				//WcharsToUint64(tempAdapter, inputBuffor, 3, (32 * 4) + (14 * 4));
-				words.push_back(tempAdapter);
-			}
+			//1 { // last uint
+			//1 	uint64 tempAdapter = 0;
+			//1 	//tempAdapter += inputBuffor[(encodedBlockSizeUint * wcharsInUint64) + (length32Left * wcharsInUint64)];
+			//1 	//tempAdapter <<= 16;
+			//1 	//tempAdapter += inputBuffor[(encodedBlockSizeUint * wcharsInUint64) + (length32Left * wcharsInUint64) + 1];
+			//1 	//tempAdapter <<= 16;
+			//1 	//tempAdapter += inputBuffor[(encodedBlockSizeUint * wcharsInUint64) + (length32Left * wcharsInUint64) + 2];
+			//1 	//tempAdapter <<= 16;
+			//1 	//tempAdapter <<= 16;
+			//1 	//tempAdapter += inputBuffor[(32 * 4) + (13 * 4) + 3];
+			//1 	WcharsToUint64(tempAdapter, inputBuffor, lengthLeft, (encodedBlockSizeUint * wcharsInUint64));
+			//1 	words.push_back(tempAdapter);
+			//1 }
 			
 			//words[14] >>= 16;
 			encryptedBlocks.push_back(Num(words.begin()._Ptr, words.end()._Ptr));
@@ -221,7 +228,7 @@ namespace RSA {
 		// Last uint64 has to be moved by 16 bytes >> ...
 		//  that information has to be kept.
 
-		// Decruption
+		// Decription
 		std::vector<Num> decryptedBlocks;
 		for (size i = 0; i < encryptedBlocks.size(); ++i) {
 			Num decrypted = encryptedBlocks[i].mod_pow(g_d, g_n);
@@ -232,15 +239,40 @@ namespace RSA {
 
 		// BIGINT into wchars
 		std::vector<wchar_t> outputData;
-		for (size i = 0; i < decryptedBlocks.size(); ++i) {
+		const uint64 lastDecryptedBlock = decryptedBlocks.size() - 1;
+		for (size i = 0; i < lastDecryptedBlock; ++i) {
 			for (size j = 0; j < decryptedBlocks[i].words.size(); ++j) {
 				Uint64ToWchars(outputData, decryptedBlocks[i].words[j]);
 			}
 		}
 
+		{ // last block ....
+			const uint64 lastDecryptedBlockWords = decryptedBlocks[lastDecryptedBlock].words.size() - 1;
+			// all words of last block except the very last one ...
+			for (size i = 0; i < lastDecryptedBlockWords; ++i) {
+				Uint64ToWchars(outputData, decryptedBlocks[lastDecryptedBlock].words[i]);
+			}
+
+			{ // last word
+				//outputData.push_back(L'a');
+				const auto& tempValue = decryptedBlocks[lastDecryptedBlock].words[lastDecryptedBlockWords];
+				wchar tempChar = (wchar)(tempValue);
+
+				for (int64 i = length32Left - 1; i >= 0; --i) {
+					wchar tempChar = (wchar)(tempValue << (i * 16));
+					outputData.push_back(tempChar);
+				}
+
+				//Uint64ToWchars(outputData, decryptedBlocks[lastDecryptedBlock].words[lastDecryptedBlockWords], 1); // TAM JEST TO 50 !!!!
+				//outputData.push_back(L'a');
+			}
+		}
+
+		outputData.push_back(L'\0');
+
 		//outputBuffor = new wchar[outputData.size()];
 		SendMessageW(output, WM_SETTEXT, NULL, (LPARAM)outputData.data());
-		delete[] outputBuffor;
+		//delete[] outputBuffor;
 		
 		
 		// DEBUG
@@ -265,7 +297,7 @@ namespace RSA {
 		const Num& p = RSA2048::p;
 		const Num& q = RSA2048::q;
 
-		const auto& stringLength = inputBufforLength + 1;
+		const auto& stringLength = inputBufforLength;
 		const auto& wordsLength = stringLength / blockSizeWchar;
 		const auto& wordsLeftLength = stringLength % blockSizeWchar;
 		const auto& wordsZeroesLength = blockSizeWchar - wordsLeftLength;
@@ -292,26 +324,25 @@ namespace RSA {
 
 			if (wordsLeftLength) { // Last Block (left bytes)
 
+				uint64 bufforPosition = wordsLength * blockSizeWchar;
+
 				// Cpy left bytes of 4's
-				for (size i = 0; i < l4Length * 4; ++i) {
-					const auto& bufforPtr = inputBuffor + (wordsLength * blockSizeUint) + (l4Length * i);
+				for (size i = 0; i < l4Length; ++i) {
 					uint64 tempAdapter = 0;
-					WcharsToUint64(tempAdapter, inputBuffor, wcharsInUint64, i * wcharsInUint64);
+					WcharsToUint64(tempAdapter, inputBuffor, wcharsInUint64, bufforPosition + (i * wcharsInUint64));
 					words.push_back(tempAdapter);
 				}
 
-				// Cpy left bytes of rest
-				for (size i = 0; i < l4LeftLength; ++i) {
-					const auto& bufforPtr = inputBuffor + (wordsLength * blockSizeUint) + (l4Length * wcharsInUint64) + (l4LeftLength * i);
+				{ // Cpy left bytes of rest
 					uint64 tempAdapter = 0;
-					WcharsToUint64(tempAdapter, inputBuffor, l4LeftLength, i * wcharsInUint64);
+					WcharsToUint64(tempAdapter, inputBuffor, l4LeftLength, bufforPosition + (l4Length * wcharsInUint64));
 					words.push_back(tempAdapter);
 				}
 
 				// Fill with zeroes to whole blockSizeUint length.
-				for (size i = 0; i < wordsZeroesLength; ++i) {
-					words.push_back(0);
-				}
+				//for (size i = 0; i < wordsZeroesLength; ++i) {
+				//	words.push_back(0);
+				//}
 
 				blocks.push_back(Num(words.begin()._Ptr, words.end()._Ptr));
 			}
@@ -379,7 +410,7 @@ namespace RSA {
 				0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1111'1111'1111'1111
 			};
 
-			//for (uint64 i = 0; lastLength < masks[i]; ++i) {
+			//for (uint64 i = 0; lastLength < masks[0]; ++i) {
 			//	encryptedBlocks[lastBlock].words[lastPos] <<= 16;
 			//}
 			auto& lastWord = encryptedBlocks[lastBlock].words[lastLength];

@@ -34,8 +34,9 @@ namespace RSA {
 
 		//1 // INPUT SIMULATION 
 		//1 //std::vector<wchar_t> inputData; // 16bit datatype
-		//1 std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
-		//1 //std::wstring inputData = L"12345678123456781234567812345678"; // 32 znaki - 64bytes = 64 * 8 = 512
+		//1 //std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
+		//1 std::wstring inputData = L"Text"; // 32 znaki - 64bytes = 64 * 8 = 512
+		//1 //std::wstring inputData = L"1234567890";
 		//1 
 		//1 
 		//1 
@@ -79,7 +80,7 @@ namespace RSA {
 		//1 if (wordsLeftLength) { // Last Block (left bytes)
 		//1 
 		//1 	// Cpy left bytes of 4's
-		//1 	for (size i = 0; i < l4Length * 4; ++i) {
+		//1 	for (size i = 0; i < l4Length; ++i) {
 		//1 		const auto& bufforPtr = inputData.data() + (wordsLength * blockSizeUint) + (l4Length * i);
 		//1 		uint64 tempAdapter = 0;
 		//1 		WcharsToUint64(tempAdapter, inputData.data(), wcharsInUint64, i * wcharsInUint64);

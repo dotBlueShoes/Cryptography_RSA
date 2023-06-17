@@ -407,9 +407,9 @@ namespace Window {
                 default:
                 case Windows::MainTab::RSA_256: {
                     //MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
-                    std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
-                    //RSA::Encrypt2048(outputBuffor, inputBuffor, inputLength, reOutput);
-                    RSA::Encrypt2048(outputBuffor, inputData.data(), inputData.length(), reOutput);
+                    //std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
+                    //RSA::Encrypt2048(outputBuffor, inputData.data(), inputData.length(), reOutput);
+                    RSA::Encrypt2048(outputBuffor, inputBuffor, inputLength, reOutput);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
@@ -466,9 +466,9 @@ namespace Window {
             switch (Windows::MainTab::tabState) {
 
                 default:
-                case Windows::MainTab::RSA_256: {
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                case Windows::MainTab::RSA_256: { 
                     RSA::Decrypt2048(outputBuffor, inputBuffor, inputLength, reInput);
+                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
