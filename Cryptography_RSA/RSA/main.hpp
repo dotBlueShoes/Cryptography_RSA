@@ -18,18 +18,6 @@
 
 namespace RSA {
 
-	block Generate(
-		IN const Num& p,
-		IN const Num& q
-	) {
-		g_p = p;
-		g_q = q;
-		g_n = g_p * g_q;
-		g_phi = CalculatePhi(g_p, g_q);
-		g_e = NumCalculateE(g_phi);			// encryption
-		g_d = CalculateD(g_phi, g_e);		// decryption
-	}
-
 	block Test4(
 		IN const wchar* const inputData,
 		IN const size& inputDataLength,
@@ -37,7 +25,7 @@ namespace RSA {
 		IN const size& blockSizeUint,
 		IN const size& encodedBlockSizeUint
 	) {
-		std::vector<char> buffor; // DEBUG
+		//std::vector<char> buffor; // DEBUG
 		
 		// DEBUG
 		// MessageBoxW(nullptr, inputData, L"LOGGER NOCRYPTED DATA", MB_OK);

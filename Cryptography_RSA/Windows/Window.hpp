@@ -403,33 +403,38 @@ namespace Window {
 
         { // PROCESS
             switch (Windows::MainTab::tabState) {
-
                 default:
                 case Windows::MainTab::RSA_256: {
-                    //MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
-                    //std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
-                    //RSA::Encrypt2048(outputBuffor, inputData.data(), inputData.length(), reOutput);
-                    RSA::Encrypt2048(outputBuffor, inputBuffor, inputLength, reOutput);
+                    RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
+                    outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA256::blockSizeWchar, RSA::RSA256::blockSizeUint);
+                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
+                    RSA::Generate(RSA::RSA512::p, RSA::RSA512::q);
+                    outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA512::blockSizeWchar, RSA::RSA512::blockSizeUint);
                     MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_1024: {
+                    RSA::Generate(RSA::RSA1024::p, RSA::RSA1024::q);
+                    outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA1024::blockSizeWchar, RSA::RSA1024::blockSizeUint);
                     MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_2048: {
+                    RSA::Generate(RSA::RSA2048::p, RSA::RSA2048::q);
+                    outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA2048::blockSizeWchar, RSA::RSA2048::blockSizeUint);
                     MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
                 }
 
             }
 
             //outputBuffor[outputCount] = L'\0';
-            //SendMessageW(reOutput, WM_SETTEXT, NULL, (LPARAM)outputBuffor);
+            SendMessageW(reOutput, WM_SETTEXT, NULL, (LPARAM)outputBuffor);
         }
 
+        delete[] outputBuffor;
         delete[] inputBuffor;
     }
 
@@ -445,18 +450,7 @@ namespace Window {
         wchar* inputBuffor = new wchar[inputStringTerminationPosition];
         wchar* keyBuffor = new wchar[keyStringTerminationPosition];
 
-        // OUTPUT BUFFOR NECESSITIES
-        //const uint64 inputBytesLength = inputLength * 2;
-        //const uint64 blocksCount = inputBytesLength / 16; 
-        
-        //uint64 outputCount;
-        //
-        //if (aesWordsLeft == 0)
-        //    outputCount = (blocksCount * 8);
-        //else
-        //    outputCount = (blocksCount * 8) - (8 - aesWordsLeft);
-
-        wchar* outputBuffor = nullptr; //new wchar[outputCount + 1 /* null-termination*/];
+        std::vector<wchar> outputData;
 
         // READ DATA
         SendMessageW(reOutput, WM_GETTEXT, inputStringTerminationPosition, (LPARAM)inputBuffor);
@@ -467,30 +461,33 @@ namespace Window {
 
                 default:
                 case Windows::MainTab::RSA_256: { 
-                    RSA::Decrypt2048(outputBuffor, inputBuffor, inputLength, reInput);
+                    RSA::Decrypt(outputData, inputBuffor, inputLength, RSA::RSA256::encodedBlockSizeUint);
                     MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
+                    RSA::Decrypt(outputData, inputBuffor, inputLength, RSA::RSA512::encodedBlockSizeUint);
                     MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_1024: {
+                    RSA::Decrypt(outputData, inputBuffor, inputLength, RSA::RSA1024::encodedBlockSizeUint);
                     MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_2048: {
+                    RSA::Decrypt(outputData, inputBuffor, inputLength, RSA::RSA2048::encodedBlockSizeUint);
                     MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
                 }
 
             }
 
             //outputBuffor[outputCount] = L'\0';
-            //SendMessageW(reInput, WM_SETTEXT, NULL, (LPARAM)outputBuffor);
+            SendMessageW(reInput, WM_SETTEXT, NULL, (LPARAM)outputData.data());
         }
 
+        outputData.clear();
         delete[] inputBuffor;
-        delete[] outputBuffor;
         delete[] keyBuffor;
     }
 

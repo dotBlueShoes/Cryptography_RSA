@@ -30,11 +30,11 @@ int32 APIENTRY wWinMain (
 
         // INPUT SIMULATION 
         //std::vector<wchar_t> inputData; // 16bit datatype
-        //std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
+        std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
         //std::wstring inputData = L"Text"; // 32 znaki - 64bytes = 64 * 8 = 512
         //std::wstring inputData = L"1234567890";
         //std::wstring inputData = L"TextTextTe";
-        std::wstring inputData = L"!@!@^%@&$*(@#%@QRT%Q#^#$*%^(&*_()+()_+P{}P|/O}OPPUITYDHHNBC VMVB<CVNXVZVASV@#!$%@#^%@#^&@$YW#$%*#$%^(*@TZSDSDGDSAAAAG";
+        //std::wstring inputData = L"!@!@^%@&$*(@#%@QRT%Q#^#$*%^(&*_()+()_+P{}P|/O}OPPUITYDHHNBC VMVB<CVNXVZVASV@#!$%@#^%@#^&@$YW#$%*#$%^(*@TZSDSDGDSAAAAG";
 
         //std::wstring inputData = L"!@#$";
 
@@ -65,25 +65,45 @@ int32 APIENTRY wWinMain (
         //    delete[] data;
         //}
 
-        { // 256
-            RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
-            RSA::Test4(inputData.data(), inputData.length(), RSA::RSA256::blockSizeWchar, RSA::RSA256::blockSizeUint, RSA::RSA256::encodedBlockSizeUint);
-        }
+        //{ // 256
+        //    RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
+        //    RSA::Test4(inputData.data(), inputData.length(), RSA::RSA256::blockSizeWchar, RSA::RSA256::blockSizeUint, RSA::RSA256::encodedBlockSizeUint);
+        //}
+        //
+        //{ // 512
+        //    RSA::Generate(RSA::RSA512::p, RSA::RSA512::q);
+        //    RSA::Test4(inputData.data(), inputData.length(), RSA::RSA512::blockSizeWchar, RSA::RSA512::blockSizeUint, RSA::RSA512::encodedBlockSizeUint);
+        //}
+        //
+        //{ // 1024
+        //    RSA::Generate(RSA::RSA1024::p, RSA::RSA1024::q);
+        //    RSA::Test4(inputData.data(), inputData.length(), RSA::RSA1024::blockSizeWchar, RSA::RSA1024::blockSizeUint, RSA::RSA1024::encodedBlockSizeUint);
+        //}
+        //
+        //{ // 2048
+        //    RSA::Generate(RSA::RSA2048::p, RSA::RSA2048::q);
+        //    RSA::Test4(inputData.data(), inputData.length(), RSA::RSA2048::blockSizeWchar, RSA::RSA2048::blockSizeUint, RSA::RSA2048::encodedBlockSizeUint);
+        //}
 
-        { // 512
-            RSA::Generate(RSA::RSA512::p, RSA::RSA512::q);
-            RSA::Test4(inputData.data(), inputData.length(), RSA::RSA512::blockSizeWchar, RSA::RSA512::blockSizeUint, RSA::RSA512::encodedBlockSizeUint);
-        }
-
-        { // 1024
-            RSA::Generate(RSA::RSA1024::p, RSA::RSA1024::q);
-            RSA::Test4(inputData.data(), inputData.length(), RSA::RSA1024::blockSizeWchar, RSA::RSA1024::blockSizeUint, RSA::RSA1024::encodedBlockSizeUint);
-        }
-
-        { // 2048
-            RSA::Generate(RSA::RSA2048::p, RSA::RSA2048::q);
-            RSA::Test4(inputData.data(), inputData.length(), RSA::RSA2048::blockSizeWchar, RSA::RSA2048::blockSizeUint, RSA::RSA2048::encodedBlockSizeUint);
-        }
+        //{ // 256
+        //    RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
+        //    RSA::Test4(inputData.data(), inputData.length(), RSA::RSA256::blockSizeWchar, RSA::RSA256::blockSizeUint, RSA::RSA256::encodedBlockSizeUint);
+        //}
+        //
+        //{ // 512
+        //    RSA::Generate(RSA::RSA512::p, RSA::RSA512::q);
+        //    RSA::Test4(inputData.data(), inputData.length(), RSA::RSA512::blockSizeWchar, RSA::RSA512::blockSizeUint, RSA::RSA512::encodedBlockSizeUint);
+        //}
+        //
+        //{ // 1024
+        //    RSA::Generate(RSA::RSA1024::p, RSA::RSA1024::q);
+        //    RSA::Test4(inputData.data(), inputData.length(), RSA::RSA1024::blockSizeWchar, RSA::RSA1024::blockSizeUint, RSA::RSA1024::encodedBlockSizeUint);
+        //}
+        //
+        //{ // 2048
+        //    RSA::Generate(RSA::RSA2048::p, RSA::RSA2048::q);
+        //    RSA::Test4(inputData.data(), inputData.length(), RSA::RSA2048::blockSizeWchar, RSA::RSA2048::blockSizeUint, RSA::RSA2048::encodedBlockSizeUint);
+        //}
         
     }
 
