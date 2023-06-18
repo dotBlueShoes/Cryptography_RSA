@@ -10,9 +10,16 @@
 // deszyfrowanie	
 // 1. p * q = n (1024b *1024b = 2048b)
 
+// To generate primes
+// https://www.wolframalpha.com/input?i=NextPrime%5B2%5E128+%2B+2%5E10%5D // 128 prime
+// https://www.wolframalpha.com/input?i=NextPrime%5B2%5E256+%2B+2%5E10%5D // 256 prime
+// https://www.wolframalpha.com/input?i=NextPrime%5B2%5E512+%2B+2%5E10%5D // 512 prime
+// https://www.wolframalpha.com/input?i=NextPrime%5B2%5E1024%2B+2%5E10%5D // 1024 prime
+
 #pragma once
 #include <math.h>
 #include <iostream>
+#include <tuple>
 
 #include "../Framework.hpp"
 #include "Utility.hpp"
@@ -125,6 +132,8 @@ namespace RSA {
 		// 128 + 128
 		Num p = "340282366920938463463374607432841953291";
 		Num q = "340282366920938463463374607431768212629";
+		const wchar* const p_str = L"340282366920938463463374607432841953291";
+		const wchar* const q_str = L"340282366920938463463374607431768212629";
 
 		const size nBitLength = 256; // 1024 + 1024
 		const size blockSizeWchar = 16 - 4;
@@ -138,6 +147,8 @@ namespace RSA {
 		// 256 + 256
 		Num p = "115792089237316195423570985008687907853269984665640564039457584007913130688523";
 		Num q = "115792089237316195423570985008687907853269984665640564039457584007914203382263";
+		const wchar* const p_str = L"115792089237316195423570985008687907853269984665640564039457584007913130688523";
+		const wchar* const q_str = L"115792089237316195423570985008687907853269984665640564039457584007914203382263";
 
 		const size nBitLength = 512; // 1024 + 1024
 		const size blockSizeWchar = 32 - 4;
@@ -151,6 +162,8 @@ namespace RSA {
 		// 512 + 512
 		Num p = "13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084171";
 		Num q = "13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649007132903";
+		const wchar* const p_str = L"13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084171";
+		const wchar* const q_str = L"13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649007132903";
 
 		const size nBitLength = 1024; // 1024 + 1024
 		const size blockSizeWchar = 64 - 4;
@@ -164,6 +177,8 @@ namespace RSA {
 		// 1024 + 1024
 		const Num p = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110541037861746687625057982134295314586803117506495636454552132846092481";
 		const Num q = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540932549455019067871284216267630916370798611400235905440878535115721";
+		const wchar* const p_str = L"179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110541037861746687625057982134295314586803117506495636454552132846092481";
+		const wchar* const q_str = L"179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540932549455019067871284216267630916370798611400235905440878535115721";
 
 		const size nBitLength = 2048; // 1024 + 1024
 		const size blockSizeWchar = 128 - 4;
@@ -530,6 +545,8 @@ namespace RSA {
 	//	delete[] outputBuffor;
 	//}
 
+	using ret = std::tuple<wchar*, size>;
+
 	block Generate(
 		IN const Num& p,
 		IN const Num& q
@@ -540,6 +557,57 @@ namespace RSA {
 		g_phi = CalculatePhi(g_p, g_q);
 		g_e = NumCalculateE(g_phi);			// encryption
 		g_d = CalculateD(g_phi, g_e);		// decryption
+	}
+
+	block FileToWchars(
+		OUT std::vector<wchar>& buffor,
+		IN const wchar* const inputFilepath
+	) {
+		std::vector<byte> readData(FileIO::Read::File(inputFilepath));
+
+		const uint64 bytesInWchar = 2;
+		const uint64 length = readData.size() / bytesInWchar;
+		const uint64 left = readData.size() % bytesInWchar;
+
+		for (size i = 0; i < length; ++i) {
+			wchar temp = readData[i * bytesInWchar];
+			temp <<= 8;
+			temp += readData[(i * bytesInWchar) + 1];
+			buffor.push_back(temp);
+		}
+
+		if (left) {
+			wchar temp = readData[(length * bytesInWchar)];
+			buffor.push_back(temp << 8);
+		}
+
+	}
+
+	block WcharsToFile(
+		IN const wchar* const buffor,
+		IN const size& bufforLength,
+		IN const wchar* const outputFilepath
+	) {
+		std::vector<byte> writeData;
+
+		const uint64 bytesInWchar = 2;
+		const uint64 lastElementPos = bufforLength - 1;
+		auto& lastElement = buffor[lastElementPos];
+
+		for (size i = 0; i < lastElementPos; ++i) {
+			uint8 temp = buffor[i] >> 8;
+			writeData.push_back(temp);
+			temp = buffor[i];
+			writeData.push_back(temp);
+		}
+
+		if (lastElement <= 0b0000'0000'1111'1111) {
+			writeData.push_back(lastElement);
+		} else {
+			writeData.push_back(lastElement >> 8);
+		}
+
+		FileIO::Write::File(outputFilepath, writeData.size(), writeData.data());
 	}
 
 	block Encrypt(
@@ -598,12 +666,6 @@ namespace RSA {
 			Num nocrypted(blocks[i]);
 			Num encrypted = nocrypted.mod_pow(g_e, g_n);
 			encryptedBlocks.push_back(encrypted);
-
-			//{ // DEBUG
-			//	encrypted.print(buffor);
-			//	MessageBoxA(nullptr, buffor.data(), "LOGGER ENCRYPTED", MB_OK);
-			//}
-
 		}
 
 		{ // WriteToWchars 16bit
@@ -623,7 +685,8 @@ namespace RSA {
 				}
 
 				WstringsToWstring(outputData, dataSize, results);
-				return outputData;
+				//return outputData;
+				return ret(outputData, dataSize);
 			}
 		}
 
@@ -701,22 +764,6 @@ namespace RSA {
 			}
 
 			outputData.push_back(L'\0');
-
-			//return outputData.data();
-			//{ // DEBUG
-
-			//outputData = 
-			//MessageBoxW(nullptr, outputData.data(), L"LOGGER DECRYPTED DATA", MB_OK);
-
-			//	uint64 isEqual = 0;
-			//	for (size i = 0; i < decryptedBlocks.size(); ++i) {
-			//		isEqual += decryptedBlocks[i] == blocks[i];
-			//	}
-			//	if (isEqual)
-			//		MessageBoxW(nullptr, L"YES", L"LOGGER FINAL", MB_OK);
-			//	else
-			//		MessageBoxW(nullptr, L"NO", L"LOGGER FINAL", MB_OK);
-			//}
 
 		}
 	}

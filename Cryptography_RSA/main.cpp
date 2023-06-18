@@ -28,9 +28,15 @@ int32 APIENTRY wWinMain (
         Window::MyRegisterClass(process, classNameMainWindow);
         if (!Window::InitInstance(process, nCmdShow, classNameMainWindow, titleMainWindow, windowPosition, windowArea)) return FALSE;
 
+        //// find the biggest probable prime less than 10^42
+        //// Num p = Num(10).pow(42) - 1;
+
+        // RSA P and Q !!!
+        RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
+
         // INPUT SIMULATION 
         //std::vector<wchar_t> inputData; // 16bit datatype
-        std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
+        //std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
         //std::wstring inputData = L"Text"; // 32 znaki - 64bytes = 64 * 8 = 512
         //std::wstring inputData = L"1234567890";
         //std::wstring inputData = L"TextTextTe";

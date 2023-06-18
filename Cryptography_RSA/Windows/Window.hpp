@@ -20,8 +20,8 @@ namespace Window {
 
     // GLOBALS
     HINSTANCE currentProcess;
-    HWND buttonEncodePath, buttonDecodePath, buttonEncode, buttonDecode,
-        reKey, reInputPath, reOutputPath, reInput, reOutput;
+    HWND buttonEncodePath, buttonDecodePath, buttonEncode, buttonDecode, buttonSubmit,
+        pInput, qInput, reInputPath, reOutputPath, reInput, reOutput;
 
     uint8 aesBytesLeftPath, aesWordsLeft;
 
@@ -165,23 +165,30 @@ namespace Window {
                     //  for shoutcut this is how it should be on windows 10.
                     const pair<int32> nonClientAreaOffset { 15, 28 };
                     const pair<int32>
-                        keyPosition { 20 + 40 + 10, 10 + tabXOffset },
-                        keyArea { 870 + 37, 24 };
-                
-                    { // Key Value
+                        key1Position { 40 + 10, 10 + tabXOffset },
+                        keyArea { 300, 40 },
+                        key2Position { key1Position.x + keyArea.x + 80, key1Position.y },
+                        submitPosition { key2Position.x + keyArea.x + 110, key1Position.y },
+                        submitArea { 100, 28 };
 
-                        const uint32 singleLineStyle = WS_VISIBLE | WS_CHILD | WS_BORDER | WS_TABSTOP;
+                    { // p
+                        const uint32 multiLineStyle = ES_MULTILINE | WS_VISIBLE | WS_CHILD | WS_BORDER | WS_TABSTOP | WS_HSCROLL;
+                        CreateWindow(L"STATIC", L"P:", WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 10 + tabXOffset + 3, 100, 100, windowHandle, nullptr, process, nullptr);
+                        pInput = CreateRichEdit(process, windowHandle, key1Position, keyArea, multiLineStyle, RSA::RSA256::p_str);
+                    }
 
-                        const wchar
-                            * preText = L"Key";
+                    { // q
+                        const uint32 multiLineStyle = ES_MULTILINE | WS_VISIBLE | WS_CHILD | WS_BORDER | WS_TABSTOP | WS_HSCROLL;
+                        CreateWindow(L"STATIC", L"Q:", WS_VISIBLE | WS_CHILD | SS_LEFT, 20 + keyArea.x + 80, 10 + tabXOffset + 3, 100, 100, windowHandle, nullptr, process, nullptr);
+                        qInput = CreateRichEdit(process, windowHandle, key2Position, keyArea, multiLineStyle, RSA::RSA256::q_str);
+                    }
 
-                        /* Text creation */
-                        CreateWindow(L"STATIC", L"Key :", WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 10 + tabXOffset + 3, 100, 100, windowHandle, nullptr, process, nullptr);
-                        reKey = CreateRichEdit(process, windowHandle, keyPosition, keyArea, singleLineStyle, preText);
+                    { // submit
+                        buttonSubmit = CreateButton(process, windowHandle, submitPosition, submitArea, L"Submit");
                     }
 
                     const pair<int32>
-                        positionWindowFile { 10, keyPosition.y + keyArea.y + 10 },
+                        positionWindowFile { 10, key1Position.y + keyArea.y + 10 },
                         areaWindowFile { 
                             windowArea.x - 20 - nonClientAreaOffset.x, 
                             60 + 60 + 24 
@@ -283,44 +290,69 @@ namespace Window {
         const size inputStringTerminationPosition = inputFilePathLength + 1;
         const size outputFilePathLength = SendMessageW(reOutputPath, WM_GETTEXTLENGTH, NULL, NULL);
         const size outputStringTerminationPosition = outputFilePathLength + 1;
-        const size keyValueLength = SendMessageW(reKey, WM_GETTEXTLENGTH, NULL, NULL);
-        const size keyStringTerminationPosition = keyValueLength + 1;
+        //const size keyValueLength = SendMessageW(reKey, WM_GETTEXTLENGTH, NULL, NULL);
+        //const size keyStringTerminationPosition = keyValueLength + 1;
 
         wchar* inputPathBuffor = new wchar[inputStringTerminationPosition];
         wchar* outputPathBuffor = new wchar[outputStringTerminationPosition];
-        wchar* keyBuffor = new wchar[keyStringTerminationPosition];
+        //wchar* keyBuffor = new wchar[keyStringTerminationPosition];
 
         // READ INPUT_FIELD DATA
         SendMessageW(reInputPath, WM_GETTEXT, inputStringTerminationPosition, (LPARAM)inputPathBuffor);
         SendMessageW(reOutputPath, WM_GETTEXT, outputStringTerminationPosition, (LPARAM)outputPathBuffor);
-        SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
+        //SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
+
+        // Debug
+        //const wchar* const nocryptFilePath = LR"(data/asci1.txt)";
+        //const wchar* const encryptFilePath = LR"(data/asci2.txt)";
+        //const wchar* const decryptFilePath = LR"(data/3.txt)";
+
+        std::vector<wchar> data;
+        //wchar* outputBuffor = nullptr;
+        RSA::ret outputBuffor;
 
         { // PROCESS
             switch (Windows::MainTab::tabState) {
 
                 default:
                 case Windows::MainTab::RSA_256: {
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    RSA::FileToWchars(data, inputPathBuffor);
+                    outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA256::blockSizeWchar, RSA::RSA256::blockSizeUint);
+                    RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
+                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
+                    RSA::FileToWchars(data, inputPathBuffor);
+                    outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA512::blockSizeWchar, RSA::RSA512::blockSizeUint);
+                    RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
+                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_1024: {
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
+                    RSA::FileToWchars(data, inputPathBuffor);
+                    outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA1024::blockSizeWchar, RSA::RSA1024::blockSizeUint);
+                    RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
+                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_2048: {
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
+                    RSA::FileToWchars(data, inputPathBuffor);
+                    outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA2048::blockSizeWchar, RSA::RSA2048::blockSizeUint);
+                    RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
+                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
                 }
 
             }
         }
 
+        // Debug
+        //MessageBoxW(nullptr, std::get<0>(outputBuffor), L"LOGGER ENCRYPTED", MB_OK);
+
         delete[] inputPathBuffor;
         delete[] outputPathBuffor;
-        delete[] keyBuffor;
+        delete[] std::get<0>(outputBuffor);
+        //delete[] keyBuffor;
     }
 
     block OnButtonDecodePathClicked(
@@ -332,35 +364,50 @@ namespace Window {
         const size inputStringTerminationPosition = inputFilePathLength + 1;
         const size outputFilePathLength = SendMessageW(reOutputPath, WM_GETTEXTLENGTH, NULL, NULL);
         const size outputStringTerminationPosition = outputFilePathLength + 1;
-        const size keyValueLength = SendMessageW(reKey, WM_GETTEXTLENGTH, NULL, NULL);
-        const size keyStringTerminationPosition = keyValueLength + 1;
+        //const size keyValueLength = SendMessageW(reKey, WM_GETTEXTLENGTH, NULL, NULL);
+        //const size keyStringTerminationPosition = keyValueLength + 1;
 
         wchar* inputPathBuffor = new wchar[inputStringTerminationPosition];
         wchar* outputPathBuffor = new wchar[outputStringTerminationPosition];
-        wchar* keyBuffor = new wchar[keyStringTerminationPosition];
+        //wchar* keyBuffor = new wchar[keyStringTerminationPosition];
 
         // READ INPUT_FIELD DATA
         SendMessageW(reInputPath, WM_GETTEXT, inputStringTerminationPosition, (LPARAM)inputPathBuffor);
         SendMessageW(reOutputPath, WM_GETTEXT, outputStringTerminationPosition, (LPARAM)outputPathBuffor);
-        SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
+        //SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
+
+        std::vector<wchar> outputData;
+        std::vector<wchar> data;
 
         { // PROCESS
             switch (Windows::MainTab::tabState) {
 
                 default:
                 case Windows::MainTab::RSA_256: {
+                    RSA::FileToWchars(data, inputPathBuffor);
+                    RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA256::encodedBlockSizeUint);
+                    RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
                     MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
+                    RSA::FileToWchars(data, inputPathBuffor);
+                    RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA512::encodedBlockSizeUint);
+                    RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
                     MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_1024: {
+                    RSA::FileToWchars(data, inputPathBuffor);
+                    RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA1024::encodedBlockSizeUint);
+                    RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
                     MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_2048: {
+                    RSA::FileToWchars(data, inputPathBuffor);
+                    RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA2048::encodedBlockSizeUint);
+                    RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
                     MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
                 }
 
@@ -369,7 +416,7 @@ namespace Window {
 
         delete[] inputPathBuffor;
         delete[] outputPathBuffor;
-        delete[] keyBuffor;
+       // delete[] keyBuffor;
     }
 
     block OnButtonEncodeClick(
@@ -379,51 +426,42 @@ namespace Window {
         // READ LENGTH
         const size inputLength = SendMessageW(reInput, WM_GETTEXTLENGTH, NULL, NULL);
         const size inputStringTerminationPosition = inputLength + 1;
-        const size keyValueLength = SendMessageW(reKey, WM_GETTEXTLENGTH, NULL, NULL);
-        const size keyStringTerminationPosition = keyValueLength + 1;
+        //const size keyValueLength = SendMessageW(reKey, WM_GETTEXTLENGTH, NULL, NULL);
+        //const size keyStringTerminationPosition = keyValueLength + 1;
 
         wchar* inputBuffor = new wchar[inputStringTerminationPosition];
-        wchar* keyBuffor = new wchar[keyStringTerminationPosition];
+        //wchar* keyBuffor = new wchar[keyStringTerminationPosition];
 
         // OUTPUT BUFFOR NECESSITIES
         const uint64 inputBytesLength = inputLength * 2;
         const uint64 blocksCount = inputBytesLength / 16;
-        //uint64 outputCount;
-
-        //if (inputBytesLength % 16 == 0)
-        //    outputCount = (blocksCount * 8);
-        //else
-        //    outputCount = (blocksCount * 8) + 8;
         
-        wchar* outputBuffor = nullptr; // = new wchar[outputCount + 1 /* null-termination*/];
+        RSA::ret outputBuffor;
+        //wchar* outputBuffor = nullptr;
 
         // READ DATA
         SendMessageW(reInput, WM_GETTEXT, inputStringTerminationPosition, (LPARAM)inputBuffor);
-        SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
+        //SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
 
         { // PROCESS
             switch (Windows::MainTab::tabState) {
                 default:
                 case Windows::MainTab::RSA_256: {
-                    RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
                     outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA256::blockSizeWchar, RSA::RSA256::blockSizeUint);
                     MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
-                    RSA::Generate(RSA::RSA512::p, RSA::RSA512::q);
                     outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA512::blockSizeWchar, RSA::RSA512::blockSizeUint);
                     MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_1024: {
-                    RSA::Generate(RSA::RSA1024::p, RSA::RSA1024::q);
                     outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA1024::blockSizeWchar, RSA::RSA1024::blockSizeUint);
                     MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_2048: {
-                    RSA::Generate(RSA::RSA2048::p, RSA::RSA2048::q);
                     outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA2048::blockSizeWchar, RSA::RSA2048::blockSizeUint);
                     MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
                 }
@@ -431,10 +469,10 @@ namespace Window {
             }
 
             //outputBuffor[outputCount] = L'\0';
-            SendMessageW(reOutput, WM_SETTEXT, NULL, (LPARAM)outputBuffor);
+            SendMessageW(reOutput, WM_SETTEXT, NULL, (LPARAM)std::get<0>(outputBuffor));
         }
 
-        delete[] outputBuffor;
+        delete[] std::get<0>(outputBuffor);
         delete[] inputBuffor;
     }
 
@@ -444,17 +482,17 @@ namespace Window {
         // READ LENGTH
         const size inputLength = SendMessageW(reOutput, WM_GETTEXTLENGTH, NULL, NULL);
         const size inputStringTerminationPosition = inputLength + 1;
-        const size keyValueLength = SendMessageW(reKey, WM_GETTEXTLENGTH, NULL, NULL);
-        const size keyStringTerminationPosition = keyValueLength + 1;
+        //const size keyValueLength = SendMessageW(reKey, WM_GETTEXTLENGTH, NULL, NULL);
+        //const size keyStringTerminationPosition = keyValueLength + 1;
 
         wchar* inputBuffor = new wchar[inputStringTerminationPosition];
-        wchar* keyBuffor = new wchar[keyStringTerminationPosition];
+        //wchar* keyBuffor = new wchar[keyStringTerminationPosition];
 
         std::vector<wchar> outputData;
 
         // READ DATA
         SendMessageW(reOutput, WM_GETTEXT, inputStringTerminationPosition, (LPARAM)inputBuffor);
-        SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
+        //SendMessageW(reKey, WM_GETTEXT, keyStringTerminationPosition, (LPARAM)keyBuffor);
 
         { // PROCESS
             switch (Windows::MainTab::tabState) {
@@ -488,7 +526,34 @@ namespace Window {
 
         outputData.clear();
         delete[] inputBuffor;
-        delete[] keyBuffor;
+        //delete[] keyBuffor;
+    }
+
+    block OnButtonSubmit(
+        const HWND& windowHandle
+    ) {
+        // GET P & Q
+        const size qInputLength = SendMessageW(qInput, WM_GETTEXTLENGTH, NULL, NULL);
+        const size qInputLengthTerminationPosition = qInputLength + 1;
+        const size pInputLength = SendMessageW(pInput, WM_GETTEXTLENGTH, NULL, NULL);
+        const size pInputLengthTerminationPosition = pInputLength + 1;
+
+        //wchar* qWchars = new wchar[qInputLengthTerminationPosition];
+        //wchar* pWchars = new wchar[pInputLengthTerminationPosition];
+        char* qChars = new char[qInputLengthTerminationPosition + 1];
+        char* pChars = new char[qInputLengthTerminationPosition + 1];
+
+        // READ INPUT_FIELD DATA
+        SendMessageA(qInput, WM_GETTEXT, qInputLengthTerminationPosition, (LPARAM)qChars);
+        SendMessageA(pInput, WM_GETTEXT, pInputLengthTerminationPosition, (LPARAM)pChars);
+
+        qChars[qInputLengthTerminationPosition] = '\0';
+        pChars[pInputLengthTerminationPosition] = '\0';
+
+        RSA::g_p = pChars;
+        RSA::g_q = qChars;
+
+        RSA::Generate(RSA::g_p, RSA::g_q);
     }
 
     LRESULT CALLBACK WndProc(
@@ -511,18 +576,30 @@ namespace Window {
                         // Could this be optimized ?
                         default:
                         case Windows::MainTab::ID_TAB_0: {
+                            SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA256::p_str);
+                            SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA256::q_str);
+                            RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_0;
                         } break;
 
                         case Windows::MainTab::ID_TAB_1: {
+                            SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA512::p_str);
+                            SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA512::q_str);
+                            RSA::Generate(RSA::RSA512::p, RSA::RSA512::q);
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_1;
                         } break;
 
                         case Windows::MainTab::ID_TAB_2: {
+                            SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA1024::p_str);
+                            SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA1024::q_str);
+                            RSA::Generate(RSA::RSA1024::p, RSA::RSA1024::q);
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_2;
                         } break;
 
                         case Windows::MainTab::ID_TAB_3: {
+                            SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA2048::p_str);
+                            SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA2048::q_str);
+                            RSA::Generate(RSA::RSA2048::p, RSA::RSA2048::q);
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_3;
                         }
 
@@ -543,6 +620,8 @@ namespace Window {
                     OnButtonEncodeClick(windowHandle);
                 } else if (id == buttonDecode) {
                     OnButtonDecodeClick(windowHandle);
+                } else if (id == buttonSubmit) {
+                    OnButtonSubmit(windowHandle);
                 }
 
                 switch (wmId) {
