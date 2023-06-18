@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include "../Framework.hpp"
+#include "Utility.hpp"
 #include "num.hpp"
 
 namespace RSA {

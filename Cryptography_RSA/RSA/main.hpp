@@ -34,12 +34,13 @@ namespace RSA {
 		IN const wchar* const inputData,
 		IN const size& inputDataLength,
 		IN const size& blockSizeWchar,
-		IN const size& blockSizeUint
+		IN const size& blockSizeUint,
+		IN const size& encodedBlockSizeUint
 	) {
 		std::vector<char> buffor; // DEBUG
 		
 		// DEBUG
-		MessageBoxW(nullptr, inputData, L"LOGGER NOCRYPTED DATA", MB_OK);
+		// MessageBoxW(nullptr, inputData, L"LOGGER NOCRYPTED DATA", MB_OK);
 		
 		std::vector<Num> blocks;
 		std::vector<Num::word> words; // 64bit datatype
@@ -92,68 +93,128 @@ namespace RSA {
 			Num encrypted = nocrypted.mod_pow(g_e, g_n);
 			encryptedBlocks.push_back(encrypted);
 		
-			{ // DEBUG
-				encrypted.print(buffor);
-				MessageBoxA(nullptr, buffor.data(), "LOGGER ENCRYPTED", MB_OK);
-			}
+			//{ // DEBUG
+			//	encrypted.print(buffor);
+			//	MessageBoxA(nullptr, buffor.data(), "LOGGER ENCRYPTED", MB_OK);
+			//}
 			
 		}
-		
-		// Decription
-		std::vector<Num> decryptedBlocks;
-		for (size i = 0; i < encryptedBlocks.size(); ++i) {
-			Num decrypted = encryptedBlocks[i].mod_pow(g_d, g_n);
-			decryptedBlocks.push_back(decrypted);
-		}
 
-		// BigInts into Wchars
-		std::vector<wchar_t> outputData;
-		const uint64 lastDecryptedBlock = decryptedBlocks.size() - 1;
-		for (size i = 0; i < lastDecryptedBlock; ++i) {
-			for (size j = 0; j < decryptedBlocks[i].words.size(); ++j) {
-				Uint64ToWchars(outputData, decryptedBlocks[i].words[j]);
+		{ // WriteToWchars 16bit
+			std::vector<WBuffor> results;
+			for (size i = 0; i < encryptedBlocks.size(); ++i) {
+				Uint64sToWstring(results, encryptedBlocks[i].words);
 			}
-		}
+			
+			{ // std::vector<WBuffor> TO wchars
+				wchar* data = nullptr;
+				size dataSize = 0;
 
-		{ // Last Block ....
-			const uint64 lastDecryptedBlockWords = decryptedBlocks[lastDecryptedBlock].words.size() - 1;
-			for (size i = 0; i < lastDecryptedBlockWords; ++i) {
-				Uint64ToWchars(outputData, decryptedBlocks[lastDecryptedBlock].words[i]);
-			}
+				{ // GET LENGTH;
+					const size length = wBufforLength * results.size();
+					dataSize = length + 1;
+					data = new wchar[dataSize];
+				}
 
-			// Last Word ....
-			uint64 masks[] {
-				0b0000'0000'0000'0000'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111,
-				0b0000'0000'0000'0000'0000'0000'0000'0000'1111'1111'1111'1111'1111'1111'1111'1111,
-				0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1111'1111'1111'1111,
-			};
-			auto& tempValue = decryptedBlocks[lastDecryptedBlock].words[lastDecryptedBlockWords];
-			size counter = 1; // 1 byte
-			if (tempValue > masks[0]) {			// 4byte'y
-				counter = 4;
-			} else if (tempValue > masks[1]) {	// 3byte'y
-				counter = 3;
-			} else if (tempValue > masks[2]) {	// 2byte'y
-				counter = 2;
-			}
-			for (int64 i = counter - 1; i >= 0; --i) {
-				wchar tempChar = (wchar)(tempValue << (i * 16));
-				outputData.push_back(tempChar);
-			}
-		}
+				WstringsToWstring(data, dataSize, results);
 
-		outputData.push_back(L'\0');
-		
-		{ // DEBUG
-			MessageBoxW(nullptr, outputData.data(), L"LOGGER DECRYPTED DATA", MB_OK);
-			uint64 isEqual = 0;
-			for (size i = 0; i < decryptedBlocks.size(); ++i) {
-				isEqual += decryptedBlocks[i] == blocks[i];
+				{ // ReadFromWchars
+					std::vector<Num> readblocks;
+					std::vector<Num::word> readWords;
+
+					WstringToUint64s(readWords, data, dataSize - 1);
+					
+					const uint64 rblocks = readWords.size() / encodedBlockSizeUint;
+					const uint64 rleft = readWords.size() % encodedBlockSizeUint;
+
+					for (size i = 0; i < rblocks; ++i) {
+						const auto& begin = readWords.data() + (i * encodedBlockSizeUint);
+						const auto& end = begin + encodedBlockSizeUint;
+						readblocks.push_back(Num(begin, end));
+					}
+
+					if (rleft) {
+						const auto& begin = readWords.data() + (rblocks * encodedBlockSizeUint);
+						const auto& end = begin + rleft;
+						readblocks.push_back(Num(begin, end));
+					}
+
+					{ // Decription
+
+						// Decription
+						std::vector<Num> decryptedBlocks;
+						for (size i = 0; i < readblocks.size(); ++i) {
+							Num decrypted = readblocks[i].mod_pow(g_d, g_n);
+							decryptedBlocks.push_back(decrypted);
+						}
+
+						// BigInts into Wchars
+						std::vector<wchar_t> outputData;
+						const uint64 lastDecryptedBlock = decryptedBlocks.size() - 1;
+						for (size i = 0; i < lastDecryptedBlock; ++i) {
+							for (size j = 0; j < decryptedBlocks[i].words.size(); ++j) {
+								Uint64ToWchars(outputData, decryptedBlocks[i].words[j]);
+							}
+						}
+
+						{ // Last Block ....
+							const uint64 lastDecryptedBlockWords = decryptedBlocks[lastDecryptedBlock].words.size() - 1;
+							for (size i = 0; i < lastDecryptedBlockWords; ++i) {
+								Uint64ToWchars(outputData, decryptedBlocks[lastDecryptedBlock].words[i]);
+							}
+
+							// Last Word ....
+							uint64 masks[] {
+								0b0000'0000'0000'0000'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111,
+								0b0000'0000'0000'0000'0000'0000'0000'0000'1111'1111'1111'1111'1111'1111'1111'1111,
+								0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1111'1111'1111'1111,
+							};
+							auto& tempValue = decryptedBlocks[lastDecryptedBlock].words[lastDecryptedBlockWords];
+							size counter = 5;	// 0 iterations
+							if (tempValue < masks[2]) {			// 4byte'y
+								counter = 2;	// 3 iterations
+							} else if (tempValue < masks[1]) {	// 3byte'y
+								counter = 3;	// 2 iterations
+							} else if (tempValue < masks[0]) {	// 2byte'y
+								counter = 4;	// 1 iteration
+							}
+							for (int64 i = counter - 2; i >= 0; --i) {
+								wchar tempChar = tempValue >> (i * 16); // 1, 0 a nie 2, 1
+								//wchar tempChar = tempValue >> 16;
+								outputData.push_back(tempChar);
+							}
+						}
+
+						// begin of 64 int
+						// 0000'0000.0000'0000
+						// 0000'0000.0000'0000
+						// 0000'0000.0000'0000
+						// 16bit wchar
+						// 0000'0000
+						// 0011'1001
+						// 0000'0000
+						// 0011'0000
+
+						outputData.push_back(L'\0');
+
+						{ // DEBUG
+							MessageBoxW(nullptr, outputData.data(), L"LOGGER DECRYPTED DATA", MB_OK);
+							uint64 isEqual = 0;
+							for (size i = 0; i < decryptedBlocks.size(); ++i) {
+								isEqual += decryptedBlocks[i] == blocks[i];
+							}
+							if (isEqual)
+								MessageBoxW(nullptr, L"YES", L"LOGGER FINAL", MB_OK);
+							else
+								MessageBoxW(nullptr, L"NO", L"LOGGER FINAL", MB_OK);
+						}
+
+					}
+
+				}
+
+				delete[] data;
 			}
-			if (isEqual)
-				MessageBoxW(nullptr, L"YES", L"LOGGER FINAL", MB_OK);
-			else
-				MessageBoxW(nullptr, L"NO", L"LOGGER FINAL", MB_OK);
 		}
 		
 	}
@@ -171,82 +232,6 @@ namespace RSA {
 	}
 
 	void DecryptWText() {
-
-	}
-
-
-	const size wBufforLength = 20;
-	using WBuffor = std::array<wchar, wBufforLength + 1>;
-
-	block WstringsToWstring(
-		OUT wchar* result,
-		OUT size& resultLength,
-		IN const std::vector<WBuffor>& strings
-	) {
-		for (size i = 0; i < strings.size(); ++i) {
-			for (size j = 0; j < wBufforLength; ++j) {
-				result[j + (i * wBufforLength)] = strings[i][j];
-			}
-		}
-
-		result[resultLength - 1] = L'\0';
-	}
-
-	block Uint64sToWstring(
-		OUT std::vector<WBuffor>& results,
-		IN const std::vector<Num::word>& words
-	) {
-		int written = 0;
-
-		for (size i = 0; i < words.size(); ++i) {
-			WBuffor buffor { 0 }, zeroesBuffor { 0 }; // 1 extra for null-terminator.
-
-			written = swprintf(buffor.data(), buffor.size(), L"%llu", words[i]);
-
-			// FORCE 0es to appear at the begin - 00001234.
-			const int zeroes = wBufforLength - written;
-			if (zeroes) {
-				for (size j = 0; j < zeroes; ++j) {
-					zeroesBuffor[j] = L'0';
-				}
-
-				for (size j = 0; j < written; ++j) {
-					zeroesBuffor[zeroes + j] = buffor[j];
-				}
-				buffor = zeroesBuffor;
-			}
-
-			results.push_back(buffor);
-		}
-
-		results.size();
-	}
-
-	block WstringToUint64s(
-		OUT std::vector<Num::word>& words,
-		IN const wchar* encodedData,
-		IN const size& encodedDataSize
-	) {
-		wchar* end;
-
-		const uint64 packets = encodedDataSize / wBufforLength;
-		const uint64 left = encodedDataSize % wBufforLength;
-
-		for (size i = 0; i < packets; ++i) {
-
-			WBuffor buffor { 0 };
-
-			// Copy To buffor
-			for (size j = 0; j < wBufforLength; ++j) {
-				buffor[j] = encodedData[(i * wBufforLength) + j];
-			}
-
-			uint64 result = wcstoull(buffor.data(), &end, 10);
-			words.push_back(result);
-
-		}
-
-		words.size();
 
 	}
 
