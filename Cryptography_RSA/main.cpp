@@ -28,7 +28,57 @@ int32 APIENTRY wWinMain (
         Window::MyRegisterClass(process, classNameMainWindow);
         if (!Window::InitInstance(process, nCmdShow, classNameMainWindow, titleMainWindow, windowPosition, windowArea)) return FALSE;
 
-        RSA::Test4();
+        // INPUT SIMULATION 
+        //std::vector<wchar_t> inputData; // 16bit datatype
+        std::wstring inputData = L"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012312"; // 124 signs
+        //std::wstring inputData = L"Text"; // 32 znaki - 64bytes = 64 * 8 = 512
+        //std::wstring inputData = L"1234567890";
+
+        { // WSTRING <=> UINT64 with 0'es TEST
+            std::vector<Num::word> words; // Empty container for processed words to use in NUM creation.
+            std::vector<RSA::WBuffor> results; // Empty containter for processed wstrings ready to write.
+            //const wchar encodedData[] = L"184467440737095516151844674407370955161518446744073709551615";
+            const wchar encodedData[] = L"000000000737095516151844674407370955161518446744073709551615";
+            const size encodedDataSize = 60;
+            wchar* data = nullptr;
+            size dataSize = 0;
+
+            RSA::WstringToUint64s(words, encodedData, encodedDataSize);
+            RSA::Uint64sToWstring(results, words);
+
+            words.clear();
+
+            { // GET LENGTH;
+                const size length = RSA::wBufforLength * results.size();
+                dataSize = length + 1;
+                data = new wchar[dataSize];
+            }
+
+            RSA::WstringsToWstring(data, dataSize, results);
+            RSA::WstringToUint64s(words, data, dataSize - 1);
+            delete[] data;
+        }
+
+        { // 256
+            RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
+            RSA::Test4(inputData.data(), inputData.length(), RSA::RSA256::blockSizeWchar, RSA::RSA256::blockSizeUint);
+        }
+
+        { // 512
+            RSA::Generate(RSA::RSA512::p, RSA::RSA512::q);
+            RSA::Test4(inputData.data(), inputData.length(), RSA::RSA512::blockSizeWchar, RSA::RSA512::blockSizeUint);
+        }
+
+        { // 1024
+            RSA::Generate(RSA::RSA1024::p, RSA::RSA1024::q);
+            RSA::Test4(inputData.data(), inputData.length(), RSA::RSA1024::blockSizeWchar, RSA::RSA1024::blockSizeUint);
+        }
+
+        { // 2048
+            RSA::Generate(RSA::RSA2048::p, RSA::RSA2048::q);
+            RSA::Test4(inputData.data(), inputData.length(), RSA::RSA2048::blockSizeWchar, RSA::RSA2048::blockSizeUint);
+        }
+       
         //RSA::BigIntTest();
 
         /* { // TESTS

@@ -21,7 +21,11 @@ namespace RSA {
 
 	const size wcharsInUint64 = 4;
 
-	Num g_n, g_phi, g_e, g_d;
+	Num g_p, g_q, g_n, g_phi, g_e, g_d;
+
+	//struct RSAp {
+	//	Num p, q, n, phi, e, d;
+	//};
 
 	block GreatestCommonDivisor(
 		IN Num a,
@@ -124,6 +128,8 @@ namespace RSA {
 		const size nBitLength = 256; // 1024 + 1024
 		const size blockSizeWchar = 16 - 4;
 		const size blockSizeUint = 4 - 1;
+		const size encodedBlockSizeUint = 4;
+
 	}
 
 	namespace RSA512 {
@@ -135,6 +141,8 @@ namespace RSA {
 		const size nBitLength = 512; // 1024 + 1024
 		const size blockSizeWchar = 32 - 4;
 		const size blockSizeUint = 8 - 1;
+		const size encodedBlockSizeUint = 8;
+
 	}
 
 	namespace RSA1024 {
@@ -146,6 +154,8 @@ namespace RSA {
 		const size nBitLength = 1024; // 1024 + 1024
 		const size blockSizeWchar = 64 - 4;
 		const size blockSizeUint = 16 - 1;
+		const size encodedBlockSizeUint = 16;
+
 	}
 
 	namespace RSA2048 {
@@ -210,6 +220,14 @@ namespace RSA {
 			//std::cout << inputBuffor[(32 * 4) + (13 * 4)];
 			//std::cout << inputBuffor[(32 * 4) + (13 * 4) + 1];
 			//std::cout << inputBuffor[(32 * 4) + (13 * 4) + 2];
+
+			//if (lengthLeft) {
+			//	uint64 tempAdapter = 0;
+			//	WcharsToUint64(tempAdapter, inputBuffor, lengthLeft, 0);
+			//	words.push_back(tempAdapter);
+			//	encryptedBlocks.push_back(Num(words.begin()._Ptr, words.end()._Ptr));
+			//	words.clear();
+			//}
 
 			//1 { // last uint
 			//1 	uint64 tempAdapter = 0;
@@ -373,7 +391,7 @@ namespace RSA {
 					words.push_back(tempAdapter);
 				}
 
-				{ // Cpy left bytes of rest
+				if (l4LeftLength) { // Cpy left bytes of rest
 					uint64 tempAdapter = 0;
 					WcharsToUint64(tempAdapter, inputBuffor, l4LeftLength, bufforPosition + (l4Length * wcharsInUint64));
 					words.push_back(tempAdapter);
@@ -415,6 +433,7 @@ namespace RSA {
 
 		uint64 lastPos = 0;
 		const uint64 lastBlock = encryptedBlocks.size() - 1;
+		// FOR EACH BLOCK BUT LAST ONE
 		for (size i = 0; i < lastBlock; ++i) {
 			const auto& length = encryptedBlocks[i].words.size();
 			size j = 0;
@@ -434,6 +453,11 @@ namespace RSA {
 		// it doesnt appear at the end when we're dealing with 32 words - result of 2048 encoding
 		// but here last uint64 represents a number if the biginteger it represents is samller then whole
 		// uint64 it might actually only set bits of few wchars leaving possibly 13-wchars as l'\0' !
+
+		// 1011'1101.1011'1000
+		// 1100'0000.1111'1000
+		// 0001'1001.0100'0000
+		// 0000'0000.0000'0000
 
 		{ // Get last block to get last uint64
 			const auto& lastLength = encryptedBlocks[lastBlock].words.size() - 1;
