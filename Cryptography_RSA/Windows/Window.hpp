@@ -20,7 +20,7 @@ namespace Window {
 
     // GLOBALS
     HINSTANCE currentProcess;
-    HWND buttonEncodePath, buttonDecodePath, buttonEncode, buttonDecode, buttonSubmit,
+    HWND buttonEncodePathPrompt, buttonDecodePathPrompt, buttonEncodePath, buttonDecodePath, buttonEncode, buttonDecode, buttonSubmit,
         pInput, qInput, reInputPath, reOutputPath, reInput, reOutput;
 
     uint8 aesBytesLeftPath, aesWordsLeft;
@@ -207,14 +207,19 @@ namespace Window {
                     { // File Windows
                 
                         const pair<int32>
-                            positionInputFile { 20, positionWindowFile.y + 20 },
-                            areaInputFile { 810, 24 + 10 + 18 },
-                            positionOutputFile { 20, positionInputFile.y + areaInputFile.y + 10 },
-                            areaOutputFile { 810, 24 + 10 + 18 },
-                            positionEncode { areaOutputFile.x + positionOutputFile.x + 10, positionInputFile.y },
-                            areaEncode { 100, 24 + 4 },
-                            positionDecode { areaOutputFile.x + positionOutputFile.x + 10, positionEncode.y + areaEncode.y + 10 },
-                            areaDecode { 100, 24 + 4 };
+                            areaButton { 100, 24 + 4 },
+
+                            // 1 ROW
+                            areaInputFile { 700, 24 + 10 + 18 },
+                            positionEncodePrompt { 20, positionWindowFile.y + 20 },
+                            positionInputFile { positionEncodePrompt.x + areaButton.x + 10, positionEncodePrompt.y },
+                            positionEncode { areaInputFile.x + positionInputFile.x + 10, positionInputFile.y },
+
+                            // 2 ROW
+                            areaOutputFile { 700, 24 + 10 + 18 },
+                            positionDecodePrompt { 20, positionInputFile.y + areaInputFile.y + 10 },
+                            positionOutputFile { positionInputFile.x, positionDecodePrompt.y },
+                            positionDecode { areaOutputFile.x + positionOutputFile.x + 10, positionOutputFile.y };
                 
                         const uint32 singleLineStyle = WS_VISIBLE | WS_CHILD | WS_BORDER | WS_TABSTOP;
                 
@@ -222,7 +227,11 @@ namespace Window {
                             * inputPreText = L"Input file path",
                             * outputPreText = L"Output file path",
                             * encodeText = L"Encode",
-                            * decodeText = L"Decode";
+                            * decodeText = L"Decode",
+                            * selectText = L"Select";
+
+                        buttonEncodePathPrompt = CreateButton(process, windowHandle, positionEncodePrompt, areaButton, selectText);
+                        buttonDecodePathPrompt = CreateButton(process, windowHandle, positionDecodePrompt, areaButton, selectText);
                 
                         reInputPath = CreateRichEdit(process, windowHandle, positionInputFile, areaInputFile, singleLineStyle, inputPreText);
                         reOutputPath = CreateRichEdit(process, windowHandle, positionOutputFile, areaOutputFile, singleLineStyle, outputPreText);
@@ -231,8 +240,8 @@ namespace Window {
                         SendMessageW(reInputPath, EM_SHOWSCROLLBAR, SB_HORZ, TRUE);
                         SendMessageW(reOutputPath, EM_SHOWSCROLLBAR, SB_HORZ, TRUE);
 
-                        buttonEncodePath = CreateButton(process, windowHandle, positionEncode, areaEncode, encodeText);
-                        buttonDecodePath = CreateButton(process, windowHandle, positionDecode, areaDecode, decodeText);
+                        buttonEncodePath = CreateButton(process, windowHandle, positionEncode, areaButton, encodeText);
+                        buttonDecodePath = CreateButton(process, windowHandle, positionDecode, areaButton, decodeText);
                     }
                 
                     { // Text Windows
@@ -310,49 +319,59 @@ namespace Window {
         std::vector<wchar> data;
         //wchar* outputBuffor = nullptr;
         RSA::ret outputBuffor;
+        int64 result = 0;
 
         { // PROCESS
             switch (Windows::MainTab::tabState) {
 
                 default:
                 case Windows::MainTab::RSA_256: {
-                    RSA::FileToWchars(data, inputPathBuffor);
-                    outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA256::blockSizeWchar, RSA::RSA256::blockSizeUint);
-                    RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
-                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    if (!RSA::FileToWchars(data, inputPathBuffor)) {
+                        outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA256::blockSizeWchar, RSA::RSA256::blockSizeUint);
+                        RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
+                        MessageBox(windowHandle, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    } else {
+                        MessageBox(windowHandle, L"File is Empty!", L"Error", MB_OK);
+                    }
+                    
                 } break;
 
                 case Windows::MainTab::RSA_512: {
-                    RSA::FileToWchars(data, inputPathBuffor);
-                    outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA512::blockSizeWchar, RSA::RSA512::blockSizeUint);
-                    RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
-                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
+                    if (!RSA::FileToWchars(data, inputPathBuffor)) {
+                        outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA512::blockSizeWchar, RSA::RSA512::blockSizeUint);
+                        RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
+                        MessageBox(windowHandle, L"Succefully Encrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
+                    } else {
+                        MessageBox(windowHandle, L"File is Empty!", L"Error", MB_OK);
+                    }
                 } break;
 
                 case Windows::MainTab::RSA_1024: {
-                    RSA::FileToWchars(data, inputPathBuffor);
-                    outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA1024::blockSizeWchar, RSA::RSA1024::blockSizeUint);
-                    RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
-                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
+                    if (!RSA::FileToWchars(data, inputPathBuffor)) {
+                        outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA1024::blockSizeWchar, RSA::RSA1024::blockSizeUint);
+                        RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
+                        MessageBox(windowHandle, L"Succefully Encrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
+                    } else {
+                        MessageBox(windowHandle, L"File is Empty!", L"Error", MB_OK);
+                    }
                 } break;
 
                 case Windows::MainTab::RSA_2048: {
-                    RSA::FileToWchars(data, inputPathBuffor);
-                    outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA2048::blockSizeWchar, RSA::RSA2048::blockSizeUint);
-                    RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
-                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
+                    if (!RSA::FileToWchars(data, inputPathBuffor)) {
+                        outputBuffor = RSA::Encrypt(data.data(), data.size(), RSA::RSA2048::blockSizeWchar, RSA::RSA2048::blockSizeUint);
+                        RSA::WcharsToFile(std::get<0>(outputBuffor), std::get<1>(outputBuffor), outputPathBuffor);
+                        MessageBox(windowHandle, L"Succefully Encrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
+                    } else {
+                        MessageBox(windowHandle, L"File is Empty!", L"Error", MB_OK);
+                    }
                 }
 
             }
         }
 
-        // Debug
-        //MessageBoxW(nullptr, std::get<0>(outputBuffor), L"LOGGER ENCRYPTED", MB_OK);
-
         delete[] inputPathBuffor;
         delete[] outputPathBuffor;
         delete[] std::get<0>(outputBuffor);
-        //delete[] keyBuffor;
     }
 
     block OnButtonDecodePathClicked(
@@ -384,31 +403,43 @@ namespace Window {
 
                 default:
                 case Windows::MainTab::RSA_256: {
-                    RSA::FileToWchars(data, inputPathBuffor);
-                    RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA256::encodedBlockSizeUint);
-                    RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    if (!RSA::FileToWchars(data, inputPathBuffor)) {
+                        RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA256::encodedBlockSizeUint);
+                        RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
+                        MessageBox(windowHandle, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    } else {
+                        MessageBox(windowHandle, L"File is Empty!", L"Error", MB_OK);
+                    }
                 } break;
 
                 case Windows::MainTab::RSA_512: {
-                    RSA::FileToWchars(data, inputPathBuffor);
-                    RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA512::encodedBlockSizeUint);
-                    RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
+                    if (!RSA::FileToWchars(data, inputPathBuffor)) {
+                        RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA512::encodedBlockSizeUint);
+                        RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
+                        MessageBox(windowHandle, L"Succefully Decrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
+                    } else {
+                        MessageBox(windowHandle, L"File is Empty!", L"Error", MB_OK);
+                    }
                 } break;
 
                 case Windows::MainTab::RSA_1024: {
-                    RSA::FileToWchars(data, inputPathBuffor);
-                    RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA1024::encodedBlockSizeUint);
-                    RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
+                    if (!RSA::FileToWchars(data, inputPathBuffor)) {
+                        RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA1024::encodedBlockSizeUint);
+                        RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
+                        MessageBox(windowHandle, L"Succefully Decrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
+                    } else {
+                        MessageBox(windowHandle, L"File is Empty!", L"Error", MB_OK);
+                    }
                 } break;
 
                 case Windows::MainTab::RSA_2048: {
-                    RSA::FileToWchars(data, inputPathBuffor);
-                    RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA2048::encodedBlockSizeUint);
-                    RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
+                    if (!RSA::FileToWchars(data, inputPathBuffor)) {
+                        RSA::Decrypt(outputData, data.data(), data.size(), RSA::RSA2048::encodedBlockSizeUint);
+                        RSA::WcharsToFile(outputData.data(), outputData.size() - 1, outputPathBuffor);
+                        MessageBox(windowHandle, L"Succefully Decrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
+                    } else {
+                        MessageBox(windowHandle, L"File is Empty!", L"Error", MB_OK);
+                    }
                 }
 
             }
@@ -448,22 +479,22 @@ namespace Window {
                 default:
                 case Windows::MainTab::RSA_256: {
                     outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA256::blockSizeWchar, RSA::RSA256::blockSizeUint);
-                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    MessageBox(windowHandle, L"Succefully Encrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
                     outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA512::blockSizeWchar, RSA::RSA512::blockSizeUint);
-                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
+                    MessageBox(windowHandle, L"Succefully Encrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_1024: {
                     outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA1024::blockSizeWchar, RSA::RSA1024::blockSizeUint);
-                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
+                    MessageBox(windowHandle, L"Succefully Encrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_2048: {
                     outputBuffor = RSA::Encrypt(inputBuffor, inputLength, RSA::RSA2048::blockSizeWchar, RSA::RSA2048::blockSizeUint);
-                    MessageBox(nullptr, L"Succefully Encrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
+                    MessageBox(windowHandle, L"Succefully Encrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
                 }
 
             }
@@ -500,22 +531,22 @@ namespace Window {
                 default:
                 case Windows::MainTab::RSA_256: { 
                     RSA::Decrypt(outputData, inputBuffor, inputLength, RSA::RSA256::encodedBlockSizeUint);
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
+                    MessageBox(windowHandle, L"Succefully Decrypted " STRING_KEY_1, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_512: {
                     RSA::Decrypt(outputData, inputBuffor, inputLength, RSA::RSA512::encodedBlockSizeUint);
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
+                    MessageBox(windowHandle, L"Succefully Decrypted " STRING_KEY_2, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_1024: {
                     RSA::Decrypt(outputData, inputBuffor, inputLength, RSA::RSA1024::encodedBlockSizeUint);
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
+                    MessageBox(windowHandle, L"Succefully Decrypted " STRING_KEY_3, STRING_RESULT, MB_OK);
                 } break;
 
                 case Windows::MainTab::RSA_2048: {
                     RSA::Decrypt(outputData, inputBuffor, inputLength, RSA::RSA2048::encodedBlockSizeUint);
-                    MessageBox(nullptr, L"Succefully Decrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
+                    MessageBox(windowHandle, L"Succefully Decrypted " STRING_KEY_4, STRING_RESULT, MB_OK);
                 }
 
             }
@@ -556,6 +587,20 @@ namespace Window {
         RSA::Generate(RSA::g_p, RSA::g_q);
     }
 
+    block OnButtonEncodePathPromptClicked (
+       IN  const HWND& windowHandle
+    ) {
+        FileIO::WinAPI::OpenFilePrompt(windowHandle);
+        SendMessageW(reInputPath, WM_SETTEXT, NULL, (LPARAM)FileIO::WinAPI::openedFile.lpstrFile);
+    }
+
+    block OnButtonDecodePathPromptClicked(
+        IN const HWND& windowHandle
+    ) {
+        FileIO::WinAPI::SaveFilePrompt(windowHandle);
+        SendMessageW(reOutputPath, WM_SETTEXT, NULL, (LPARAM)FileIO::WinAPI::openedFile.lpstrFile);
+    }
+
     LRESULT CALLBACK WndProc(
         HWND windowHandle,
         UINT message,
@@ -571,6 +616,10 @@ namespace Window {
                     /// Indeks aktualnej kontrolki, Get Current Selected
                     const int index(SendMessage(Windows::MainTab::tabHandle, TCM_GETCURSEL, 0, 0)); 
 
+                    //CHARRANGE cr { 0 };
+                    //cr.cpMin = -1;
+                    //cr.cpMax = -1;
+
                     switch (index) {
 
                         // Could this be optimized ?
@@ -579,6 +628,8 @@ namespace Window {
                             SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA256::p_str);
                             SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA256::q_str);
                             RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
+                            UpdateWindow(qInput);
+                            UpdateWindow(pInput);
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_0;
                         } break;
 
@@ -586,13 +637,19 @@ namespace Window {
                             SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA512::p_str);
                             SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA512::q_str);
                             RSA::Generate(RSA::RSA512::p, RSA::RSA512::q);
+                            UpdateWindow(qInput);
+                            UpdateWindow(pInput);
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_1;
                         } break;
 
                         case Windows::MainTab::ID_TAB_2: {
+                            //SendMessageW(qInput, EM_EXSETSEL, 0, (LPARAM)&cr);
+                            //SendMessageW(qInput, EM_REPLACESEL, 0, (LPARAM)RSA::RSA1024::p_str);
                             SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA1024::p_str);
                             SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA1024::q_str);
                             RSA::Generate(RSA::RSA1024::p, RSA::RSA1024::q);
+                            //UpdateWindow(qInput);
+                            //UpdateWindow(pInput);
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_2;
                         } break;
 
@@ -600,6 +657,8 @@ namespace Window {
                             SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA2048::p_str);
                             SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA2048::q_str);
                             RSA::Generate(RSA::RSA2048::p, RSA::RSA2048::q);
+                            UpdateWindow(qInput);
+                            UpdateWindow(pInput);
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_3;
                         }
 
@@ -612,7 +671,11 @@ namespace Window {
                 int wmId = LOWORD(wParam);
                 auto id = (HWND)lParam;
 
-                if (id == buttonEncodePath) {
+                if (id == buttonEncodePathPrompt) {
+                    OnButtonEncodePathPromptClicked(windowHandle);
+                } else if (id == buttonDecodePathPrompt) {
+                    OnButtonDecodePathPromptClicked(windowHandle);
+                } else if (id == buttonEncodePath) {
                     OnButtonEncodePathClicked(windowHandle);
                 } else if (id == buttonDecodePath) {
                     OnButtonDecodePathClicked(windowHandle);
@@ -634,9 +697,9 @@ namespace Window {
 
             } break;
 
-            case WM_GETTEXTLENGTH: {
-                MessageBox(windowHandle, L"Nacisn¹³eœ przycisk!", L"2!", MB_ICONINFORMATION);
-            } break;
+            //case WM_GETTEXTLENGTH: {
+            //    //MessageBox(windowHandle, L"Nacisn¹³eœ przycisk!", L"2!", MB_ICONINFORMATION);
+            //} break;
 
             case WM_PAINT: {
                 PAINTSTRUCT ps;

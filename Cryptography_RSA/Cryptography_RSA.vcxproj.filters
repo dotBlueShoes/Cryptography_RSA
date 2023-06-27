@@ -39,9 +39,6 @@
     <ClInclude Include="RSA\main.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="bigint_n.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
     <ClInclude Include="RSA\RSA.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>

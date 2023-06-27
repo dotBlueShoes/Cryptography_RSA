@@ -11,6 +11,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN             // Wyklucz rzadko używane rzeczy z nagłówków systemu Windows
 #include <windows.h>
+#include <commdlg.h>
 
 // OTHER
 #include <stdlib.h>

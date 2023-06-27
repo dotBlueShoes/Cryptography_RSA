@@ -131,7 +131,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="bigint_n.h" />
     <ClInclude Include="IO\FileIO.hpp" />
     <ClInclude Include="Framework.hpp" />
     <ClInclude Include="RSA\main.hpp" />
