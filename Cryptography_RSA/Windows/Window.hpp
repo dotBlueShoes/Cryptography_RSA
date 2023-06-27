@@ -21,7 +21,7 @@ namespace Window {
     // GLOBALS
     HINSTANCE currentProcess;
     HWND buttonEncodePathPrompt, buttonDecodePathPrompt, buttonEncodePath, buttonDecodePath, buttonEncode, buttonDecode, buttonSubmit,
-        pInput, qInput, reInputPath, reOutputPath, reInput, reOutput;
+        pInput, qInput, nInput, eInput, dInput, reInputPath, reOutputPath, reInput, reOutput;
 
     uint8 aesBytesLeftPath, aesWordsLeft;
 
@@ -165,30 +165,72 @@ namespace Window {
                     //  for shoutcut this is how it should be on windows 10.
                     const pair<int32> nonClientAreaOffset { 15, 28 };
                     const pair<int32>
-                        key1Position { 40 + 10, 10 + tabXOffset },
-                        keyArea { 300, 40 },
-                        key2Position { key1Position.x + keyArea.x + 80, key1Position.y },
-                        submitPosition { key2Position.x + keyArea.x + 110, key1Position.y },
+                        pInPosition { 40, 10 + tabXOffset },
+                        pInArea { 380, 40 },
+                        qInPosition { pInPosition.x + pInArea.x + 30, pInPosition.y },
+                        submitPosition { qInPosition.x + pInArea.x + 10, pInPosition.y },
                         submitArea { 100, 28 };
 
+                    const uint32 multiLineStyle = ES_MULTILINE | WS_VISIBLE | WS_CHILD | WS_BORDER | WS_TABSTOP | WS_HSCROLL;
+                    std::vector<char> buffor;
+
                     { // p
-                        const uint32 multiLineStyle = ES_MULTILINE | WS_VISIBLE | WS_CHILD | WS_BORDER | WS_TABSTOP | WS_HSCROLL;
+                        
                         CreateWindow(L"STATIC", L"P:", WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 10 + tabXOffset + 3, 100, 100, windowHandle, nullptr, process, nullptr);
-                        pInput = CreateRichEdit(process, windowHandle, key1Position, keyArea, multiLineStyle, RSA::RSA256::p_str);
+                        pInput = CreateRichEdit(process, windowHandle, pInPosition, pInArea, multiLineStyle, RSA::RSA256::p_str);
                     }
 
                     { // q
-                        const uint32 multiLineStyle = ES_MULTILINE | WS_VISIBLE | WS_CHILD | WS_BORDER | WS_TABSTOP | WS_HSCROLL;
-                        CreateWindow(L"STATIC", L"Q:", WS_VISIBLE | WS_CHILD | SS_LEFT, 20 + keyArea.x + 80, 10 + tabXOffset + 3, 100, 100, windowHandle, nullptr, process, nullptr);
-                        qInput = CreateRichEdit(process, windowHandle, key2Position, keyArea, multiLineStyle, RSA::RSA256::q_str);
+                        CreateWindow(L"STATIC", L"Q:", WS_VISIBLE | WS_CHILD | SS_LEFT, 20 + pInArea.x + 30, 10 + tabXOffset + 3, 100, 100, windowHandle, nullptr, process, nullptr);
+                        qInput = CreateRichEdit(process, windowHandle, qInPosition, pInArea, multiLineStyle, RSA::RSA256::q_str);
                     }
 
                     { // submit
                         buttonSubmit = CreateButton(process, windowHandle, submitPosition, submitArea, L"Submit");
                     }
 
+                    // n, e, d
                     const pair<int32>
-                        positionWindowFile { 10, key1Position.y + keyArea.y + 10 },
+                        nInArea { 280, 40 },
+                        nInPosition { 40, pInPosition.y + pInArea.y + 10 },
+                        eInPosition { nInPosition.x + nInArea.x + 30, pInPosition.y + pInArea.y + 10 },
+                        dInPosition { eInPosition.x + nInArea.x + 30, pInPosition.y + pInArea.y + 10 };
+
+                    { // N
+                        RSA::g_n.print(buffor);
+                        const size length = strlen(buffor.data()) + 1;
+                        wchar* wText = new wchar[length];
+                        mbstowcs(wText, buffor.data(), length);
+
+                        CreateWindow(L"STATIC", L"N:", WS_VISIBLE | WS_CHILD | SS_LEFT, 20, nInPosition.y, 100, 100, windowHandle, nullptr, process, nullptr);
+                        nInput = CreateRichEdit(process, windowHandle, nInPosition, nInArea, multiLineStyle, wText);
+                        delete[] wText;
+                    }
+
+                    { // E
+                        RSA::g_e.print(buffor);
+                        const size length = strlen(buffor.data()) + 1;
+                        wchar* wText = new wchar[length];
+                        mbstowcs(wText, buffor.data(), length);
+
+                        CreateWindow(L"STATIC", L"E:", WS_VISIBLE | WS_CHILD | SS_LEFT, 20 + nInArea.x + 30, eInPosition.y, 100, 100, windowHandle, nullptr, process, nullptr);
+                        eInput = CreateRichEdit(process, windowHandle, eInPosition, nInArea, multiLineStyle, wText);
+                        delete[] wText;
+                    }
+
+                    { // D
+                        RSA::g_d.print(buffor);
+                        const size length = strlen(buffor.data()) + 1;
+                        wchar* wText = new wchar[length];
+                        mbstowcs(wText, buffor.data(), length);
+
+                        CreateWindow(L"STATIC", L"D:", WS_VISIBLE | WS_CHILD | SS_LEFT, 20 + nInArea.x + 30 + nInArea.x + 30, dInPosition.y, 100, 100, windowHandle, nullptr, process, nullptr);
+                        dInput = CreateRichEdit(process, windowHandle, dInPosition, nInArea, multiLineStyle, wText);
+                        delete[] wText;
+                    }
+
+                    const pair<int32>
+                        positionWindowFile { 10, nInPosition.y + nInArea.y + 10 },
                         areaWindowFile { 
                             windowArea.x - 20 - nonClientAreaOffset.x, 
                             60 + 60 + 24 
@@ -601,6 +643,39 @@ namespace Window {
         SendMessageW(reOutputPath, WM_SETTEXT, NULL, (LPARAM)FileIO::WinAPI::openedFile.lpstrFile);
     }
 
+    block SetTextFieldsNED() {
+
+        std::vector<char> buffor;
+
+        { // N
+            RSA::g_n.print(buffor);
+            const size length = strlen(buffor.data()) + 1;
+            wchar* wText = new wchar[length];
+            mbstowcs(wText, buffor.data(), length);
+            SendMessageW(nInput, WM_SETTEXT, NULL, (LPARAM)wText);
+            delete[] wText;
+        }
+
+        { // E
+            RSA::g_e.print(buffor);
+            const size length = strlen(buffor.data()) + 1;
+            wchar* wText = new wchar[length];
+            mbstowcs(wText, buffor.data(), length);
+            SendMessageW(eInput, WM_SETTEXT, NULL, (LPARAM)wText);
+            delete[] wText;
+        }
+
+        { // D
+            RSA::g_d.print(buffor);
+            const size length = strlen(buffor.data()) + 1;
+            wchar* wText = new wchar[length];
+            mbstowcs(wText, buffor.data(), length);
+            SendMessageW(dInput, WM_SETTEXT, NULL, (LPARAM)wText);
+            delete[] wText;
+        }
+
+    }
+
     LRESULT CALLBACK WndProc(
         HWND windowHandle,
         UINT message,
@@ -628,38 +703,40 @@ namespace Window {
                             SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA256::p_str);
                             SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA256::q_str);
                             RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
-                            UpdateWindow(qInput);
-                            UpdateWindow(pInput);
+                            SetTextFieldsNED();
+
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_0;
+                            MessageBox(windowHandle, L"Succefully Generated Keys " STRING_KEY_1, STRING_RESULT, MB_OK);
                         } break;
 
                         case Windows::MainTab::ID_TAB_1: {
                             SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA512::p_str);
                             SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA512::q_str);
                             RSA::Generate(RSA::RSA512::p, RSA::RSA512::q);
-                            UpdateWindow(qInput);
-                            UpdateWindow(pInput);
+                            SetTextFieldsNED();
+
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_1;
+                            MessageBox(windowHandle, L"Succefully Generated Keys " STRING_KEY_2, STRING_RESULT, MB_OK);
                         } break;
 
                         case Windows::MainTab::ID_TAB_2: {
-                            //SendMessageW(qInput, EM_EXSETSEL, 0, (LPARAM)&cr);
-                            //SendMessageW(qInput, EM_REPLACESEL, 0, (LPARAM)RSA::RSA1024::p_str);
                             SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA1024::p_str);
                             SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA1024::q_str);
                             RSA::Generate(RSA::RSA1024::p, RSA::RSA1024::q);
-                            //UpdateWindow(qInput);
-                            //UpdateWindow(pInput);
+                            SetTextFieldsNED();
+
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_2;
+                            MessageBox(windowHandle, L"Succefully Generated Keys " STRING_KEY_3, STRING_RESULT, MB_OK);
                         } break;
 
                         case Windows::MainTab::ID_TAB_3: {
                             SendMessageW(qInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA2048::p_str);
                             SendMessageW(pInput, WM_SETTEXT, NULL, (LPARAM)RSA::RSA2048::q_str);
                             RSA::Generate(RSA::RSA2048::p, RSA::RSA2048::q);
-                            UpdateWindow(qInput);
-                            UpdateWindow(pInput);
+                            SetTextFieldsNED();
+
                             Windows::MainTab::tabState = Windows::MainTab::ID_TAB_3;
+                            MessageBox(windowHandle, L"Succefully Generated Keys " STRING_KEY_4, STRING_RESULT, MB_OK);
                         }
 
                     }

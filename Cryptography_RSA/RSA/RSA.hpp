@@ -56,9 +56,10 @@ namespace RSA {
 	}
 
 	block NumCalculateE(
-		IN const Num& phi
+		IN const Num& phi,
+		IN const Num& min = 3
 	) {
-		Num e = 3;
+		Num e = min;
 
 		while (e.gcd(e, phi) != 1) e += 2;
 
@@ -139,6 +140,9 @@ namespace RSA {
 		const size blockSizeWchar = 16 - 4;
 		const size blockSizeUint = 4 - 1;
 		const size encodedBlockSizeUint = 4;
+		//const size blockSizeWchar = 32 - 4;
+		//const size blockSizeUint = 8 - 1;
+		//const size encodedBlockSizeUint = 8;
 
 	}
 
@@ -154,6 +158,9 @@ namespace RSA {
 		const size blockSizeWchar = 32 - 4;
 		const size blockSizeUint = 8 - 1;
 		const size encodedBlockSizeUint = 8;
+		//const size blockSizeWchar = 64 - 4;
+		//const size blockSizeUint = 16 - 1;
+		//const size encodedBlockSizeUint = 16;
 
 	}
 
@@ -169,6 +176,9 @@ namespace RSA {
 		const size blockSizeWchar = 64 - 4;
 		const size blockSizeUint = 16 - 1;
 		const size encodedBlockSizeUint = 16;
+		//const size blockSizeWchar = 128 - 4;
+		//const size blockSizeUint = 32 - 1;
+		//const size encodedBlockSizeUint = 32;
 
 	}
 
@@ -184,6 +194,9 @@ namespace RSA {
 		const size blockSizeWchar = 128 - 4;
 		const size blockSizeUint = 32 - 1;
 		const size encodedBlockSizeUint = 32;
+		//const size blockSizeWchar = 256 - 4;
+		//const size blockSizeUint = 64 - 1;
+		//const size encodedBlockSizeUint = 64;
 
 	}
 
@@ -199,9 +212,11 @@ namespace RSA {
 		g_q = q;
 		g_n = g_p * g_q;
 		g_phi = CalculatePhi(g_p, g_q);
-		g_e = NumCalculateE(g_phi);			// encryption
+		g_e = NumCalculateE(g_phi, 65537);	// encryption
 		g_d = CalculateD(g_phi, g_e);		// decryption
 
+		//g_n.print(buffor);
+		//MessageBoxA(nullptr, buffor.data(), "N", MB_OK);
 		//g_e.print(buffor);
 		//MessageBoxA(nullptr, buffor.data(), "E", MB_OK);
 		//g_d.print(buffor);
@@ -236,6 +251,10 @@ namespace RSA {
 		return 0;
 
 	}
+
+	//block BytesToFile() {
+	//
+	//}
 
 	block WcharsToFile(
 		IN const wchar* const buffor,

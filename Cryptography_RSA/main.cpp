@@ -25,14 +25,14 @@ int32 APIENTRY wWinMain (
     { // Window Creation.
         const pair<int32> windowPosition { CW_USEDEFAULT, 0 }, windowArea { 1000, 600 };
 
+        // RSA FIRST !!!
+        RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
+
         Window::MyRegisterClass(process, classNameMainWindow);
         if (!Window::InitInstance(process, nCmdShow, classNameMainWindow, titleMainWindow, windowPosition, windowArea)) return FALSE;
 
         //// find the biggest probable prime less than 10^42
         //// Num p = Num(10).pow(42) - 1;
-
-        // RSA P and Q !!!
-        RSA::Generate(RSA::RSA256::p, RSA::RSA256::q);
 
         // INPUT SIMULATION 
         //std::vector<wchar_t> inputData; // 16bit datatype
