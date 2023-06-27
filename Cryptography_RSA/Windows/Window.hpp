@@ -602,47 +602,6 @@ namespace Window {
         //delete[] keyBuffor;
     }
 
-    block OnButtonSubmit(
-        const HWND& windowHandle
-    ) {
-        // GET P & Q
-        const size qInputLength = SendMessageW(qInput, WM_GETTEXTLENGTH, NULL, NULL);
-        const size qInputLengthTerminationPosition = qInputLength + 1;
-        const size pInputLength = SendMessageW(pInput, WM_GETTEXTLENGTH, NULL, NULL);
-        const size pInputLengthTerminationPosition = pInputLength + 1;
-
-        //wchar* qWchars = new wchar[qInputLengthTerminationPosition];
-        //wchar* pWchars = new wchar[pInputLengthTerminationPosition];
-        char* qChars = new char[qInputLengthTerminationPosition + 1];
-        char* pChars = new char[qInputLengthTerminationPosition + 1];
-
-        // READ INPUT_FIELD DATA
-        SendMessageA(qInput, WM_GETTEXT, qInputLengthTerminationPosition, (LPARAM)qChars);
-        SendMessageA(pInput, WM_GETTEXT, pInputLengthTerminationPosition, (LPARAM)pChars);
-
-        qChars[qInputLengthTerminationPosition] = '\0';
-        pChars[pInputLengthTerminationPosition] = '\0';
-
-        RSA::g_p = pChars;
-        RSA::g_q = qChars;
-
-        RSA::Generate(RSA::g_p, RSA::g_q);
-    }
-
-    block OnButtonEncodePathPromptClicked (
-       IN  const HWND& windowHandle
-    ) {
-        FileIO::WinAPI::OpenFilePrompt(windowHandle);
-        SendMessageW(reInputPath, WM_SETTEXT, NULL, (LPARAM)FileIO::WinAPI::openedFile.lpstrFile);
-    }
-
-    block OnButtonDecodePathPromptClicked(
-        IN const HWND& windowHandle
-    ) {
-        FileIO::WinAPI::SaveFilePrompt(windowHandle);
-        SendMessageW(reOutputPath, WM_SETTEXT, NULL, (LPARAM)FileIO::WinAPI::openedFile.lpstrFile);
-    }
-
     block SetTextFieldsNED() {
 
         std::vector<char> buffor;
@@ -674,6 +633,49 @@ namespace Window {
             delete[] wText;
         }
 
+    }
+
+    block OnButtonSubmit(
+        const HWND& windowHandle
+    ) {
+        // GET P & Q
+        const size qInputLength = SendMessageW(qInput, WM_GETTEXTLENGTH, NULL, NULL);
+        const size qInputLengthTerminationPosition = qInputLength + 1;
+        const size pInputLength = SendMessageW(pInput, WM_GETTEXTLENGTH, NULL, NULL);
+        const size pInputLengthTerminationPosition = pInputLength + 1;
+
+        //wchar* qWchars = new wchar[qInputLengthTerminationPosition];
+        //wchar* pWchars = new wchar[pInputLengthTerminationPosition];
+        char* qChars = new char[qInputLengthTerminationPosition + 1];
+        char* pChars = new char[qInputLengthTerminationPosition + 1];
+
+        // READ INPUT_FIELD DATA
+        SendMessageA(qInput, WM_GETTEXT, qInputLengthTerminationPosition, (LPARAM)qChars);
+        SendMessageA(pInput, WM_GETTEXT, pInputLengthTerminationPosition, (LPARAM)pChars);
+
+        qChars[qInputLengthTerminationPosition] = '\0';
+        pChars[pInputLengthTerminationPosition] = '\0';
+
+        RSA::g_p = pChars;
+        RSA::g_q = qChars;
+
+        RSA::Generate(RSA::g_p, RSA::g_q);
+        SetTextFieldsNED();
+        MessageBox(windowHandle, L"Succefully Generated Keys", STRING_RESULT, MB_OK);
+    }
+
+    block OnButtonEncodePathPromptClicked (
+       IN  const HWND& windowHandle
+    ) {
+        FileIO::WinAPI::OpenFilePrompt(windowHandle);
+        SendMessageW(reInputPath, WM_SETTEXT, NULL, (LPARAM)FileIO::WinAPI::openedFile.lpstrFile);
+    }
+
+    block OnButtonDecodePathPromptClicked(
+        IN const HWND& windowHandle
+    ) {
+        FileIO::WinAPI::SaveFilePrompt(windowHandle);
+        SendMessageW(reOutputPath, WM_SETTEXT, NULL, (LPARAM)FileIO::WinAPI::openedFile.lpstrFile);
     }
 
     LRESULT CALLBACK WndProc(
