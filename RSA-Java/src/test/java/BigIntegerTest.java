@@ -87,7 +87,10 @@ public class BigIntegerTest {
 
 	@Test
 	public void BigIntegerRSA256() {
-
+		//String sample = "wololo";
+		//String test1 = "ÓRWĄ-JĘ-ŻŹ//RA@!@#!@%!@%^@!^#$&*%^*^&(&*)_-+)_++*)&(%^";
+		//System.out.print(test1);
+		byte[] bytes = ByteBuffer.allocate(Long.BYTES).putLong(Long.MIN_VALUE).array();
 	}
 
 	@Test
