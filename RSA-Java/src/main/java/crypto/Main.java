@@ -1,13 +1,11 @@
 package crypto;
 
 // TODO:
-// 1. BigInt tests and understanding / done
-// 2. Add Model Project / done
-// 3. File reading and writing / done
-// 4. Proper Code-Page handling
-// 5. Text input read and write
-// 6. Sample other projects
-// 7. Test String(WString) to bytes and file and vice-versa
+// 4. whats my current block size then ? RSA256{}, RSA512{}, RSA1024{}, RSA2048{}
+// 5. Proper Code-Page handling
+// 6. Text input read and write
+// 7. Sample other projects
+// 8. Test String(WString) to bytes and file and vice-versa
 
 import java.io.File;
 import java.math.BigInteger;
