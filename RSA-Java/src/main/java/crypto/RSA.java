@@ -67,7 +67,7 @@ public class RSA {
 	public static void initialize(final BigInteger p, final BigInteger q) {
 		n = p.multiply(q);
 		phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
-		e = Generation.generateE(phi, n);
+		e = Generation.generateE(phi);
 		d = Generation.generateD(e, phi);
 
 		//byte[] sample = { 0, 1, 2, 3, 4, 5, 6 };
@@ -81,5 +81,20 @@ public class RSA {
 	public static void decrypt() {
 
 	}
+     public static BigInteger encrypt (BigInteger m) {
+         return m.modPow(e,n);
+     }
+
+    public static BigInteger dencrypt (BigInteger c) {
+        return c.modPow(d,n);
+    }
+
+    public BigInteger getE() {
+        return e;
+    }
+
+    public BigInteger getD() {
+        return d;
+    }
 
 }
