@@ -7,6 +7,8 @@ import java.nio.file.Files;
 
 public class FileIO {
 
+	public static final String to0 = "D:\\Storage\\Projects\\School\\cryptography\\Cryptography_RSA\\data\\to0.txt";
+
 	public static byte[] ReadFileToBytes(File file) {
 		try {
 
