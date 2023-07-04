@@ -1,13 +1,13 @@
 package crypto;
 
 // TODO:
-// 1. BigInt tests and understanding
-// 2. Add Model Project
-// 3. File reading and writing
+// 1. BigInt tests and understanding / done
+// 2. Add Model Project / done
+// 3. File reading and writing / done
 // 4. Proper Code-Page handling
 // 5. Text input read and write
 // 6. Sample other projects
-// 7. Tests?
+// 7. Test String(WString) to bytes and file and vice-versa
 
 import java.io.File;
 
