@@ -10,6 +10,7 @@ package crypto;
 // 7. Test String(WString) to bytes and file and vice-versa
 
 import java.io.File;
+import java.math.BigInteger;
 
 public class Main {
 
@@ -21,11 +22,26 @@ public class Main {
 	public static String t4 = "D:\\Storage\\Projects\\School\\cryptography\\Cryptography_RSA\\data\\t4.txt";
 
 	public static void main(String[] args) {
-		System.out.println("Hello world!");
 
-		File file = new File(t4);
-		byte[] data = FileIO.ReadFileToBytes(file);
-		FileIO.WriteBytesToFile(output, data);
+		System.out.println("Program Start!");
+
+		{
+			System.out.println("File READ/WRITE!");
+			File file = new File(t4);
+			byte[] data = FileIO.ReadFileToBytes(file);
+			FileIO.WriteBytesToFile(output, data);
+		}
+
+		{
+			BigInteger message = new BigInteger("100");
+
+			BigInteger p = new BigInteger("100");
+			BigInteger q = new BigInteger("100");
+			RSA.initialize(p, q);
+			//BigInteger encrypted = RSA.encrypt(message);
+			//BigInteger decrypted = RSA.decrypt(encrypted);
+		}
+
 
 	}
 
