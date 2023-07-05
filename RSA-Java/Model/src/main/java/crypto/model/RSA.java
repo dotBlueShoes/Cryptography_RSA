@@ -4,6 +4,21 @@ import java.math.BigInteger;
 
 public class RSA {
 
+	public enum Type {
+		RSA256(0),
+		RSA512(1),
+		RSA1024(2),
+		RSA2048(3);
+
+		private int value;
+		Type(int value) {
+			this.value = value;
+		}
+		public int getValue() {
+			return value;
+		}
+	}
+
 	public static class RSA256 {
 		public static final BigInteger testP = new BigInteger("340282366920938463463374607432841953291");
 		public static final BigInteger testQ = new BigInteger("340282366920938463463374607431768212629");
@@ -77,11 +92,11 @@ public class RSA {
 		d = Generation.generateD(phi, e);
 	}
 
-	public static byte[] encrypt(byte[] nocrypted) {
+	public static byte[] encrypt(byte[] nocrypted, int blockSize) {
 		return nocrypted;
 	}
 
-	public static byte[] decrypt(byte[] encrypted) {
+	public static byte[] decrypt(byte[] encrypted, int blockSize) {
 		return encrypted;
 	}
 

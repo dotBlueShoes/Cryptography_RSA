@@ -20,6 +20,7 @@ public class MainController {
 
 
 	private final Charset defaultCharset = StandardCharsets.UTF_8;
+	private RSA.Type selectedRSA = RSA.Type.RSA256;
 	private File inputFile, outputFile;
 
 	private void createInformationDialog(
@@ -60,6 +61,7 @@ public class MainController {
 			// RSA 256 Generation call
 			RSA.initialize(RSA.RSA256.testP, RSA.RSA256.testQ);
 			refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
+			selectedRSA = RSA.Type.RSA256;
 		}
 	}
 
@@ -68,6 +70,7 @@ public class MainController {
 		// RSA 256 Generation call
 		RSA.initialize(RSA.RSA512.testP, RSA.RSA512.testQ);
 		refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
+		selectedRSA = RSA.Type.RSA512;
 	}
 
 	@FXML
@@ -75,6 +78,7 @@ public class MainController {
 		// RSA 256 Generation call
 		RSA.initialize(RSA.RSA1024.testP, RSA.RSA1024.testQ);
 		refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
+		selectedRSA = RSA.Type.RSA1024;
 	}
 
 	@FXML
@@ -82,14 +86,34 @@ public class MainController {
 		// RSA 256 Generation call
 		RSA.initialize(RSA.RSA2048.testP, RSA.RSA2048.testQ);
 		refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
+		selectedRSA = RSA.Type.RSA2048;
 	}
 
 	@FXML
 	protected void onFileEncryptClick() {
 		if (inputFile != null && outputFile != null) {
 			byte[] data = FileIO.ReadFileToBytes(inputFile);
-			byte[] encrypted = RSA.encrypt(data);
-			FileIO.WriteBytesToFile(outputFile.getPath(), encrypted);
+
+			switch (selectedRSA) {
+				default:
+				case RSA256: {
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					FileIO.WriteBytesToFile(outputFile.getPath(), encrypted);
+				}
+				case RSA512: {
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					FileIO.WriteBytesToFile(outputFile.getPath(), encrypted);
+				}
+				case RSA1024: {
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					FileIO.WriteBytesToFile(outputFile.getPath(), encrypted);
+				}
+				case RSA2048: {
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					FileIO.WriteBytesToFile(outputFile.getPath(), encrypted);
+				}
+			}
+
 			createInformationDialog("Information", "Success", "Successfully Encrypted");
 		} else {
 			createInformationDialog("Information", "Warning", "Selected invalid file paths");
@@ -100,8 +124,27 @@ public class MainController {
 	protected void onFileDecryptClick() {
 		if (inputFile != null && outputFile != null) {
 			byte[] data = FileIO.ReadFileToBytes(inputFile);
-			byte[] decrypted = RSA.decrypt(data);
-			FileIO.WriteBytesToFile(outputFile.getPath(), decrypted);
+
+			switch (selectedRSA) {
+				default:
+				case RSA256: {
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					FileIO.WriteBytesToFile(outputFile.getPath(), decrypted);
+				}
+				case RSA512: {
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					FileIO.WriteBytesToFile(outputFile.getPath(), decrypted);
+				}
+				case RSA1024: {
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					FileIO.WriteBytesToFile(outputFile.getPath(), decrypted);
+				}
+				case RSA2048: {
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					FileIO.WriteBytesToFile(outputFile.getPath(), decrypted);
+				}
+			}
+
 			createInformationDialog("Information", "Success", "Successfully Decrypted");
 		} else {
 			createInformationDialog("Information", "Warning", "Selected invalid file paths");
@@ -129,8 +172,27 @@ public class MainController {
 			createInformationDialog("Information", "Warning", "No text to encrypt");
 		} else {
 			byte[] data = message.getBytes(defaultCharset);
-			byte[] encrypted = RSA.encrypt(data);
-			textAreaTextOutput.setText(new String(encrypted));
+
+			switch (selectedRSA) {
+				default:
+				case RSA256: {
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					textAreaTextOutput.setText(new String(encrypted));
+				}
+				case RSA512: {
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					textAreaTextOutput.setText(new String(encrypted));
+				}
+				case RSA1024: {
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					textAreaTextOutput.setText(new String(encrypted));
+				}
+				case RSA2048: {
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					textAreaTextOutput.setText(new String(encrypted));
+				}
+			}
+
 			createInformationDialog("Information", "Success", "Successfully Encrypted");
 		}
 	}
@@ -142,8 +204,27 @@ public class MainController {
 			createInformationDialog("Information", "Warning", "No text to decrypt");
 		} else {
 			byte[] data = message.getBytes(defaultCharset);
-			byte[] decrypted = RSA.decrypt(data);
-			textAreaTextInput.setText(new String(decrypted));
+
+			switch (selectedRSA) {
+				default:
+				case RSA256: {
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					textAreaTextInput.setText(new String(decrypted));
+				}
+				case RSA512: {
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					textAreaTextInput.setText(new String(decrypted));
+				}
+				case RSA1024: {
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					textAreaTextInput.setText(new String(decrypted));
+				}
+				case RSA2048: {
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					textAreaTextInput.setText(new String(decrypted));
+				}
+			}
+
 			createInformationDialog("Information", "Success", "Successfully Decrypted");
 		}
 	}
