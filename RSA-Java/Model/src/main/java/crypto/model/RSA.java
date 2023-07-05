@@ -152,6 +152,7 @@ public class RSA {
 			temp = RSA.bigIntegerToBytes(encryptedBlocks.get(i)); // Calc-Get
 
 			// THAT'S THE PROBLEM !
+			//  results with additional 0es in bytes
 			if (temp.length < 32) {
 				byte[] filler = new byte[encryptedBlockSize];
 				for (int x = 0; x < temp.length; ++x) {
@@ -163,6 +164,23 @@ public class RSA {
 				temp = filler;
 				//break;
 			}
+
+			// !@#!@%@!#^#$&#$^asdfasgasdgaż ź ćżzżććczxcżźćżććxzc€ó€ó€ó€asąśąśasdadasd!@#!@#!@#!@#!@#
+			// !@#!@%@!#^#$&#$^asdfasgasdgaż��ćżzżććczxcżźćżććxzc€ó€ó€ó€asąśąśasdadasd!@#!@#!@#!@#!@#
+
+			//1 // THAT'S THE PROBLEM !
+			//1 // Adding zeroes at begin results with different numbers
+			//1 if (temp.length < 32) {
+			//1 	byte[] filler = new byte[encryptedBlockSize];
+			//1 	final int difference = encryptedBlockSize - temp.length;
+			//1 	for (int x = 0; x < difference; ++x) {
+			//1 		filler[x] = 0;
+			//1 	}
+			//1 	for (int x = 0; x < temp.length; ++x) {
+			//1 		filler[difference + x] = temp[x];
+			//1 	}
+			//1 	temp = filler;
+			//1 }
 
 			for (int j = 0; j < encryptedBlockSize; ++j) { // Copy
 				result[j + (i * encryptedBlockSize)] = temp[j]; // here ?
