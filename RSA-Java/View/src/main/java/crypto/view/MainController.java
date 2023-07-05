@@ -99,19 +99,19 @@ public class MainController {
 			switch (selectedRSA) {
 				default:
 				case RSA256: {
-					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize, RSA.RSA256.encryptedBlocksSize);
 					FileIO.WriteBytesToFile(outputFile.getPath(), encrypted);
-				}
+				} break;
 				case RSA512: {
-					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA512.blockSize, RSA.RSA512.encryptedBlocksSize);
 					FileIO.WriteBytesToFile(outputFile.getPath(), encrypted);
-				}
+				} break;
 				case RSA1024: {
-					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA1024.blockSize, RSA.RSA1024.encryptedBlocksSize);
 					FileIO.WriteBytesToFile(outputFile.getPath(), encrypted);
-				}
+				} break;
 				case RSA2048: {
-					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
+					byte[] encrypted = RSA.encrypt(data, RSA.RSA2048.blockSize, RSA.RSA2048.encryptedBlocksSize);
 					FileIO.WriteBytesToFile(outputFile.getPath(), encrypted);
 				}
 			}
@@ -130,19 +130,19 @@ public class MainController {
 			switch (selectedRSA) {
 				default:
 				case RSA256: {
-					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize, RSA.RSA256.encryptedBlocksSize);
 					FileIO.WriteBytesToFile(outputFile.getPath(), decrypted);
-				}
+				} break;
 				case RSA512: {
-					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA512.blockSize, RSA.RSA512.encryptedBlocksSize);
 					FileIO.WriteBytesToFile(outputFile.getPath(), decrypted);
-				}
+				} break;
 				case RSA1024: {
-					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA1024.blockSize, RSA.RSA1024.encryptedBlocksSize);
 					FileIO.WriteBytesToFile(outputFile.getPath(), decrypted);
-				}
+				} break;
 				case RSA2048: {
-					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
+					byte[] decrypted = RSA.decrypt(data, RSA.RSA2048.blockSize, RSA.RSA2048.encryptedBlocksSize);
 					FileIO.WriteBytesToFile(outputFile.getPath(), decrypted);
 				}
 			}
@@ -178,16 +178,16 @@ public class MainController {
 			switch (selectedRSA) {
 				default:
 				case RSA256: {
-					encodedTextArea = RSA.encrypt(data, RSA.RSA256.blockSize);
-				}
+					encodedTextArea = RSA.encrypt(data, RSA.RSA256.blockSize, RSA.RSA256.encryptedBlocksSize);
+				} break;
 				case RSA512: {
-					encodedTextArea = RSA.encrypt(data, RSA.RSA256.blockSize);
-				}
+					encodedTextArea = RSA.encrypt(data, RSA.RSA512.blockSize, RSA.RSA512.encryptedBlocksSize);
+				} break;
 				case RSA1024: {
-					encodedTextArea = RSA.encrypt(data, RSA.RSA256.blockSize);
-				}
+					encodedTextArea = RSA.encrypt(data, RSA.RSA1024.blockSize, RSA.RSA1024.encryptedBlocksSize);
+				} break;
 				case RSA2048: {
-					encodedTextArea = RSA.encrypt(data, RSA.RSA256.blockSize);
+					encodedTextArea = RSA.encrypt(data, RSA.RSA2048.blockSize, RSA.RSA2048.encryptedBlocksSize);
 				}
 			}
 
@@ -211,16 +211,16 @@ public class MainController {
 			switch (selectedRSA) {
 				default:
 				case RSA256: {
-					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA256.blockSize);
-				}
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA256.blockSize, RSA.RSA256.encryptedBlocksSize);
+				} break;
 				case RSA512: {
-					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA256.blockSize);
-				}
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA512.blockSize, RSA.RSA256.encryptedBlocksSize);
+				} break;
 				case RSA1024: {
-					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA256.blockSize);
-				}
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA1024.blockSize, RSA.RSA256.encryptedBlocksSize);
+				} break;
 				case RSA2048: {
-					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA256.blockSize);
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA2048.blockSize, RSA.RSA256.encryptedBlocksSize);
 				}
 			}
 
