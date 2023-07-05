@@ -121,7 +121,7 @@ public class RSA {
 		{ // Blocks without last one.
 			for (int i = 0; i < blocksCount; ++i) {
 				for (int j = 0; j < blockSize; ++j) {
-					blockTemp[j] = nocrypted[j];
+					blockTemp[j] = nocrypted[j + (i * blockSize)];
 				}
 				nocryptedBlocks.add(bytesToBigInteger(blockTemp));
 			}
@@ -131,7 +131,7 @@ public class RSA {
 			byte[] blockLeft = new byte[leftCount];
 
 			for (int i = 0; i < leftCount; ++i) {
-				blockLeft[i] = nocrypted[i];
+				blockLeft[i] = nocrypted[i + (nocrypted.length - leftCount)];
 			}
 
 			//block = bytesToBigInteger(blockLeft);
@@ -150,8 +150,22 @@ public class RSA {
 		byte[] result = new byte[encryptedBlocks.size() * encryptedBlockSize], temp;
 		for (int i = 0; i < encryptedBlocks.size(); ++i) {
 			temp = RSA.bigIntegerToBytes(encryptedBlocks.get(i)); // Calc-Get
+
+			// THAT'S THE PROBLEM !
+			if (temp.length < 32) {
+				byte[] filler = new byte[encryptedBlockSize];
+				for (int x = 0; x < temp.length; ++x) {
+					filler[x] = temp[x];
+				}
+				for (int x = temp.length; x < encryptedBlockSize; ++x) {
+					filler[x] = 0;
+				}
+				temp = filler;
+				//break;
+			}
+
 			for (int j = 0; j < encryptedBlockSize; ++j) { // Copy
-				result[j + (i * encryptedBlockSize)] = temp[j];
+				result[j + (i * encryptedBlockSize)] = temp[j]; // here ?
 			}
 		}
 
@@ -227,8 +241,11 @@ public class RSA {
 			//byte[] result = new byte[decryptedBlocks.size() * encryptedBlockSize], temp;
 			//byte[] temp = RSA.bigIntegerToBytes(decryptedBlocks.get(0));
 
-			// !@#!@#!@%!%!#$!@#$!@#!@$!@$!@$! @$!@$!@$!@$ASFASFASGFASFASVFASFASfasfasfasfasfasfa
+			// !@#!@#!@%!%!#$!@#$!@#!@$!@$!@$!@$!@$!@$!@$ASFASFASGFASFASVFASFASfasfasfasfasfasfa
 			// !@#!@#!@%!%!#$!@#$!@#!@$!@$!@$! !@#!@#!@ %!%!#$!@#$!@#!@$!@$!@$!!@#!@#!@%!%!#$!@#$!
+
+			// !@#!@#!@%!%!#$!@#$!@#!@$@$ASFASFASGFASFASVFASFASfasfasfasfasfasfa
+			// !@#!@#!@%!%!#$!@#$!@#!@$@$ASFAS!@#!@#!@%!%!#$!@#$!@#!@$@$ASFAS!@#
 
 			return result;
 		}
