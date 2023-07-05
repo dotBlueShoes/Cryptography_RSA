@@ -18,7 +18,7 @@ public class RSATest {
 	public void bigIntegerTest() {
 
 		byte[] sample  = {
-			(byte)0b00000000,
+			//(byte)0b00000000,
 			(byte)0b11000101, (byte)0b10000001, (byte)0b11000101, (byte)0b10111001,
 			(byte)0b11000100, (byte)0b10000100, (byte)0b11000100, (byte)0b10000100,
 			(byte)0b11000101, (byte)0b10011010, (byte)0b11000100, (byte)0b10000100,
@@ -43,6 +43,7 @@ public class RSATest {
 			(byte)0b01000000, (byte)0b00100011, (byte)0b01110100, (byte)0b00100101,
 		};
 
+		//System.out.print(sample[0]);
 		//byte[] sample = { 0, 1, 2, 3, 4, 5, 6 };
 		BigInteger temp = RSA.bytesToBigInteger(sample);
 

@@ -1,6 +1,7 @@
 package crypto.model;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 public class RSA {
 
@@ -46,39 +47,45 @@ public class RSA {
 	public static byte[] bigIntegerToBytes(final BigInteger value) {
 		byte[] bytes = value.toByteArray();
 		byte[] result = new byte[bytes.length];
+		final int lastElement = result.length - 1;
 
-		for (int i = 0, j = result.length - 1; j > 0; i++, j--)
+		for (int i = 0, j = lastElement; i < result.length; i++, j--)
 			result[j] = bytes[i];
 
-		System.out.print("\n\nResult: " +  result[0] + "\n\n");
-
-		//bytes = Arrays.copyOfRange(bytes, 1, bytes.length);
-		//System.out.print(result[result.length - 1]);
-		//if (result[0] == 0) {
-		//	byte[] tmp = new byte[result.length - 1];
-		//	System.arraycopy(result, 1, tmp, 0, tmp.length);
-		//	result = tmp;
+		//{ // DEBUG
+		//	String temp = "\n\nAfter: ";
+		//	temp += result[0];
+		//	for (int i = 1; i < lastElement; ++i) {
+		//		temp += ", ";
+		//		temp += result[i];
+		//	}
+		//	temp += "\n\n";
+		//	System.out.print(temp);
 		//}
 
 		return result;
 	}
 
-	// 0000'0000
-	// 0010'0101
-	// 1100'0101
-
 	public static BigInteger bytesToBigInteger(final byte[] bytes) {
 		byte[] formatted = new byte[bytes.length + 1];
+		final int lastElement = formatted.length - 1;
 
-		for (int i = 0, j = bytes.length; j > 0; i++, j--)
+		for (int i = 0, j = lastElement; j > 0; i++, j--)
 			formatted[j] = bytes[i];
+
+		// { // DEBUG
+		// 	String temp = "\n\nBefore: ";
+		// 	temp += formatted[0];
+		// 	for (int i = 1; i < formatted.length; ++i) {
+		// 		temp += ", ";
+		// 		temp += formatted[i];
+		// 	}
+		// 	temp += "\n\n";
+		// 	System.out.print(temp);
+		// }
 
 		return new BigInteger(formatted);
 	}
-
-	// Bytes to BigInt
-	// BigInt to Bytes
-	// encryption, decryption tests
 
 	public static BigInteger p, q, n, phi, e, d;
 
@@ -93,11 +100,64 @@ public class RSA {
 	}
 
 	public static byte[] encrypt(byte[] nocrypted, int blockSize) {
-		return nocrypted;
+
+		// 1.
+		//  Construct a single block from data
+		//  Encrypt it and send
+
+		byte[] blockTemp = new byte[blockSize + 1];
+		BigInteger block, encoded;
+		//ArrayList<BigInteger> blocks = new ArrayList<BigInteger>();
+
+		int blocksCount = nocrypted.length / blockSize;
+		int leftCount = nocrypted.length % blockSize;
+
+		//{ // Blocks without last one.
+		//	for (int i = 0; i < blocksCount; ++i) {
+		//	}
+		//}
+
+		{ // Last Block e.g. LeftCount
+			byte[] blockLeft = new byte[leftCount];
+
+			blockTemp[0] = 0;
+			for (int i = 0; i < leftCount; ++i) {
+				blockLeft[i] = nocrypted[i];
+			}
+
+			block = bytesToBigInteger(blockLeft);
+			//blocks.add(bytesToBigInteger(blockLeft));
+		}
+
+
+		{ // Encryption
+			//for (var block : blocks) {
+			encoded = block.modPow(e, n);
+			//}
+		}
+
+		byte[] result = RSA.bigIntegerToBytes(encoded);
+
+		return result;
 	}
 
 	public static byte[] decrypt(byte[] encrypted, int blockSize) {
-		return encrypted;
+
+		// 1.
+		//  Construct a single block from data
+		//  Decrypt it and send
+
+		//byte[] blockTemp = new byte[blockSize];
+		BigInteger block, decoded;
+		block = bytesToBigInteger(encrypted);
+
+		{ // Decryption
+			decoded = block.modPow(d, n);
+		}
+
+		byte[] result = RSA.bigIntegerToBytes(decoded);
+
+		return result;
 	}
 
 	//public static BigInteger encrypt (BigInteger m) {

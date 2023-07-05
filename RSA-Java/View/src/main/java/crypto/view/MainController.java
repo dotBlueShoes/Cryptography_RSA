@@ -19,7 +19,7 @@ public class MainController {
 	private TextArea textAreaP, textAreaQ, textAreaN, textAreaE, textAreaD, textAreaTextInput, textAreaTextOutput;
 
 
-	private final Charset defaultCharset = StandardCharsets.UTF_8;
+	private final Charset defaultCharset = StandardCharsets.UTF_8; // UTF_16 ???
 	private RSA.Type selectedRSA = RSA.Type.RSA256;
 	private File inputFile, outputFile;
 

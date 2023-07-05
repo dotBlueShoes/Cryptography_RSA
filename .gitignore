@@ -2,6 +2,7 @@
 .idea/
 RSA-Java/target
 build/
+target/
 .mvn
 *.class
 *.java
