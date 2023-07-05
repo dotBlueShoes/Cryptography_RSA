@@ -1,6 +1,7 @@
 package crypto.view;
 
 import crypto.model.FileIO;
+import crypto.model.RSA;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -52,27 +53,31 @@ public class MainController {
 	@FXML
 	protected void onTab1() {
 		if (isInitialized()) {
-			// RSA GEN
-			refreshTextAreaParameters("1", "1", "1", "1", "1");
+			// RSA 256 Generation call
+			RSA.initialize(RSA.RSA256.testP, RSA.RSA256.testQ);
+			refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
 		}
 	}
 
 	@FXML
 	protected void onTab2() {
-		// RSA GEN
-		refreshTextAreaParameters("2", "2", "2", "2", "2");
+		// RSA 256 Generation call
+		RSA.initialize(RSA.RSA512.testP, RSA.RSA512.testQ);
+		refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
 	}
 
 	@FXML
 	protected void onTab3() {
-		// RSA GEN
-		refreshTextAreaParameters("3", "3", "3", "3", "3");
+		// RSA 256 Generation call
+		RSA.initialize(RSA.RSA1024.testP, RSA.RSA1024.testQ);
+		refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
 	}
 
 	@FXML
 	protected void onTab4() {
-		// RSA GEN
-		refreshTextAreaParameters("4", "4", "4", "4", "4");
+		// RSA 256 Generation call
+		RSA.initialize(RSA.RSA2048.testP, RSA.RSA2048.testQ);
+		refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
 	}
 
 	@FXML

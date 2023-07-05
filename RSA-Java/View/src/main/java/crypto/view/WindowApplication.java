@@ -1,5 +1,6 @@
 package crypto.view;
 
+import crypto.model.RSA;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -16,8 +17,10 @@ public class WindowApplication extends Application {
 		stage.setScene(scene);
 
 		MainController controller = fxmlLoader.getController();
-		// RSA 256 Generation call
-		controller.refreshTextAreaParameters("a", "b", "c", "d", "e");
+		{ // RSA 256 Generation call
+			RSA.initialize(RSA.RSA256.testP, RSA.RSA256.testQ);
+		}
+		controller.refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
 
 		stage.show();
 	}
