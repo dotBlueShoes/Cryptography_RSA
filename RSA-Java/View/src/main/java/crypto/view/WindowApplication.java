@@ -14,6 +14,11 @@ public class WindowApplication extends Application {
 		Scene scene = new Scene(fxmlLoader.load(), 960, 680);
 		stage.setTitle("RSA Cypher Algorithm");
 		stage.setScene(scene);
+
+		MainController controller = fxmlLoader.getController();
+		// RSA 256 Generation call
+		controller.refreshTextAreaParameters("a", "b", "c", "d", "e");
+
 		stage.show();
 	}
 

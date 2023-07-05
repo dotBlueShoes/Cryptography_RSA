@@ -1,25 +1,24 @@
-import crypto.FileIO;
+import crypto.model.RSA;
 import org.junit.Test;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.math.BigInteger;
 
 import static org.junit.Assert.assertArrayEquals;
 
-public class FileIOTest {
+public class RSATest {
+
+	public static class RSA256 {
+		String textInput0 = "";
+		String textInput1 = "ŁŹĄĄŚĄŚĄŚŃĘŚĘ$^(#6!@#^!#%!@$%!@^@#*$^IUIJEHAQEGQ@!@%RTFasfash(^&)%&*$%^@#t%";
+		String textInput2 = "";
+		String textInput3 = "";
+	}
 
 	@Test
-	public void Charset1Test() {
-		String textInput = "ŁŹĄĄŚĄŚĄŚŃĘŚĘ$^(#6!@#^!#%!@$%!@^@#*$^IUIJEHAQEGQ@!@%RTFasfash(^&)%&*$%^@#t%";
+	public void bigIntegerTest() {
 
-		//String textInput = "Hello World!";
-		//Charset charset = StandardCharsets.UTF_16;
-		//Charset charset = StandardCharsets.US_ASCII;
-		Charset charset = StandardCharsets.UTF_8;
-
-		byte[] bytes = textInput.getBytes(charset);
-
-		byte[] result  = {
+		byte[] sample  = {
+			(byte)0b00000000,
 			(byte)0b11000101, (byte)0b10000001, (byte)0b11000101, (byte)0b10111001,
 			(byte)0b11000100, (byte)0b10000100, (byte)0b11000100, (byte)0b10000100,
 			(byte)0b11000101, (byte)0b10011010, (byte)0b11000100, (byte)0b10000100,
@@ -44,11 +43,25 @@ public class FileIOTest {
 			(byte)0b01000000, (byte)0b00100011, (byte)0b01110100, (byte)0b00100101,
 		};
 
-		assertArrayEquals(
-			result,
-			bytes
-		);
+		//byte[] sample = { 0, 1, 2, 3, 4, 5, 6 };
+		BigInteger temp = RSA.bytesToBigInteger(sample);
 
-		FileIO.WriteBytesToFile(FileIO.to0, bytes);
+		byte[] result = RSA.bigIntegerToBytes(temp);
+
+		assertArrayEquals(
+			sample,
+			result
+		);
 	}
+
+	@Test
+	public void sampleTest() {
+
+		// Test for (0-block) size
+		// Test for (<block) size
+		// Test for (block) size
+		// Test for (>block) size
+
+	}
+
 }

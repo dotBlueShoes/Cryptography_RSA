@@ -4,102 +4,135 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="500.0" prefWidth="800.0" spacing="10.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="crypto.view.MainController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
-   <HBox prefHeight="0.0" prefWidth="760.0">
-      <children>
-         <Label prefHeight="18.0" prefWidth="203.0" text="Values:">
-            <HBox.margin>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </HBox.margin>
-         </Label>
-         <Label text="P:">
-            <padding>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </padding></Label>
-         <TextArea fx:id="textAreaP" prefHeight="0.0" prefWidth="192.0" />
-         <Label text="Q:">
-            <padding>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </padding></Label>
-         <TextArea fx:id="textAreaQ" prefHeight="2000.0" prefWidth="192.0" />
-      </children>
-   </HBox>
-   <HBox prefHeight="0.0" prefWidth="0.0">
-      <children>
-         <Label text="N:">
-            <padding>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </padding>
-         </Label>
-         <TextArea fx:id="textAreaN" prefHeight="0.0" prefWidth="192.0" />
-         <Label text="E:">
-            <padding>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </padding></Label>
-         <TextArea fx:id="textAreaE" prefHeight="0.0" prefWidth="192.0" />
-         <Label text="D:">
-            <padding>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </padding></Label>
-         <TextArea fx:id="textAreaD" prefHeight="0.0" prefWidth="192.0" />
-      </children>
-   </HBox>
-   <Separator prefWidth="200.0" />
-   <HBox prefHeight="100.0" prefWidth="200.0">
-      <children>
-         <Label prefHeight="45.0" prefWidth="80.0" text="File:">
-            <HBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </HBox.margin>
-         </Label>
-         <Button mnemonicParsing="false" onAction="#onFileEncryptClick" text="Encrypt File">
-            <HBox.margin>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </HBox.margin>
-         </Button>
-         <Button mnemonicParsing="false" onAction="#onFileDecryptClick" text="Decrypt File">
-            <HBox.margin>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </HBox.margin>
-         </Button>
-      </children>
-   </HBox>
-   <HBox prefHeight="0.0" prefWidth="0.0">
-      <children>
-         <Button mnemonicParsing="false" onAction="#onFileSelectInputClick" text="Select Input">
-            <HBox.margin>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </HBox.margin>
-         </Button>
-         <Button mnemonicParsing="false" onAction="#onFileSelectOutputClick" text="Select Output">
-            <HBox.margin>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </HBox.margin>
-         </Button>
-      </children>
-   </HBox>
-   <Separator prefWidth="200.0" />
-   <HBox prefHeight="0.0" prefWidth="0.0">
-      <children>
-         <Label prefHeight="45.0" prefWidth="80.0" text="Text:">
-            <HBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </HBox.margin>
-         </Label>
-         <Button mnemonicParsing="false" onAction="#onTextEncryptClick" text="Encrypt Text">
-            <HBox.margin>
-               <Insets bottom="10.0" right="10.0" top="10.0" />
-            </HBox.margin>
-         </Button>
-         <Button mnemonicParsing="false" onAction="#onTextDecryptClick" text="Decrypt Text">
-            <HBox.margin>
-               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-            </HBox.margin></Button>
-      </children>
-   </HBox>
-   <TextArea fx:id="textAreaTextInput" prefHeight="200.0" prefWidth="657.0" />
-   <TextArea fx:id="textAreaTextOutput" prefHeight="200.0" prefWidth="200.0" />
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="crypto.view.MainController">
+   <children>
+      <TabPane>
+         <tabs>
+            <Tab closable="false" onSelectionChanged="#onTab1" text="RSA 256">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" />
+              </content>
+            </Tab>
+            <Tab closable="false" onSelectionChanged="#onTab2" text="RSA 512">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" />
+              </content>
+            </Tab>
+            <Tab closable="false" onSelectionChanged="#onTab3" text="RSA 1024">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" />
+               </content>
+            </Tab>
+            <Tab closable="false" onSelectionChanged="#onTab4" text="RSA 2048">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" />
+              </content>
+            </Tab>
+         </tabs>
+      </TabPane>
+      <VBox alignment="CENTER" prefHeight="500.0" prefWidth="800.0" spacing="10.0">
+          <padding>
+              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+          </padding>
+         <HBox prefHeight="0.0" prefWidth="760.0">
+            <children>
+               <Label prefHeight="18.0" prefWidth="203.0" text="Values:">
+                  <HBox.margin>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </HBox.margin>
+               </Label>
+               <Label text="P:">
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+               </Label>
+               <TextArea fx:id="textAreaP" prefHeight="0.0" prefWidth="192.0" />
+               <Label text="Q:">
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+               </Label>
+               <TextArea fx:id="textAreaQ" prefHeight="2000.0" prefWidth="192.0" />
+            </children>
+         </HBox>
+         <HBox prefHeight="0.0" prefWidth="0.0">
+            <children>
+               <Label text="N:">
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+               </Label>
+               <TextArea fx:id="textAreaN" prefHeight="0.0" prefWidth="192.0" />
+               <Label text="E:">
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+               </Label>
+               <TextArea fx:id="textAreaE" prefHeight="0.0" prefWidth="192.0" />
+               <Label text="D:">
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+               </Label>
+               <TextArea fx:id="textAreaD" prefHeight="0.0" prefWidth="192.0" />
+            </children>
+         </HBox>
+         <Separator prefWidth="200.0" />
+         <HBox prefHeight="100.0" prefWidth="200.0">
+            <children>
+               <Label prefHeight="45.0" prefWidth="80.0" text="File:">
+                  <HBox.margin>
+                     <Insets left="10.0" right="10.0" />
+                  </HBox.margin>
+               </Label>
+               <Button mnemonicParsing="false" onAction="#onFileEncryptClick" text="Encrypt File">
+                  <HBox.margin>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </HBox.margin>
+               </Button>
+               <Button mnemonicParsing="false" onAction="#onFileDecryptClick" text="Decrypt File">
+                  <HBox.margin>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </HBox.margin>
+               </Button>
+               </children>
+         </HBox>
+         <HBox prefHeight="0.0" prefWidth="0.0">
+            <children>
+               <Button mnemonicParsing="false" onAction="#onFileSelectInputClick" text="Select Input">
+                  <HBox.margin>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </HBox.margin>
+               </Button>
+               <Button mnemonicParsing="false" onAction="#onFileSelectOutputClick" text="Select Output">
+                  <HBox.margin>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </HBox.margin>
+               </Button>
+            </children>
+         </HBox>
+         <Separator prefWidth="200.0" />
+         <HBox prefHeight="0.0" prefWidth="0.0">
+            <children>
+               <Label prefHeight="45.0" prefWidth="80.0" text="Text:">
+                  <HBox.margin>
+                     <Insets left="10.0" right="10.0" />
+                  </HBox.margin>
+               </Label>
+               <Button mnemonicParsing="false" onAction="#onTextEncryptClick" text="Encrypt Text">
+                  <HBox.margin>
+                     <Insets bottom="10.0" right="10.0" top="10.0" />
+                  </HBox.margin>
+               </Button>
+               <Button mnemonicParsing="false" onAction="#onTextDecryptClick" text="Decrypt Text">
+                  <HBox.margin>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </HBox.margin>
+               </Button>
+            </children>
+         </HBox>
+         <TextArea fx:id="textAreaTextInput" prefHeight="200.0" prefWidth="657.0" />
+         <TextArea fx:id="textAreaTextOutput" prefHeight="200.0" prefWidth="200.0" />
+      </VBox>
+   </children>
 </VBox>

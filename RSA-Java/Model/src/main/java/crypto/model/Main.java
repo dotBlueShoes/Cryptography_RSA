@@ -1,7 +1,8 @@
-package crypto;
+package crypto.model;
 
 // TODO:
 // 4. whats my current block size then ? RSA256{}, RSA512{}, RSA1024{}, RSA2048{}
+// 5. Tests tests tests....
 // 5. Proper Code-Page handling
 // 6. Text input read and write
 // 7. Sample other projects

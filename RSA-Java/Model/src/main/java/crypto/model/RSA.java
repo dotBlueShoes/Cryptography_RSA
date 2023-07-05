@@ -1,7 +1,6 @@
-package crypto;
+package crypto.model;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 public class RSA {
 
