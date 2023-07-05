@@ -11,11 +11,15 @@ import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class MainController {
 	@FXML
 	private TextArea textAreaP, textAreaQ, textAreaN, textAreaE, textAreaD, textAreaTextInput, textAreaTextOutput;
 
+
+	private final Charset defaultCharset = StandardCharsets.UTF_8;
 	private File inputFile, outputFile;
 
 	private void createInformationDialog(
@@ -84,8 +88,8 @@ public class MainController {
 	protected void onFileEncryptClick() {
 		if (inputFile != null && outputFile != null) {
 			byte[] data = FileIO.ReadFileToBytes(inputFile);
-			// ENCRYPTION ---
-			FileIO.WriteBytesToFile(outputFile.getPath(), data);
+			byte[] encrypted = RSA.encrypt(data);
+			FileIO.WriteBytesToFile(outputFile.getPath(), encrypted);
 			createInformationDialog("Information", "Success", "Successfully Encrypted");
 		} else {
 			createInformationDialog("Information", "Warning", "Selected invalid file paths");
@@ -96,8 +100,8 @@ public class MainController {
 	protected void onFileDecryptClick() {
 		if (inputFile != null && outputFile != null) {
 			byte[] data = FileIO.ReadFileToBytes(inputFile);
-			// DECRYPTION ---
-			FileIO.WriteBytesToFile(outputFile.getPath(), data);
+			byte[] decrypted = RSA.decrypt(data);
+			FileIO.WriteBytesToFile(outputFile.getPath(), decrypted);
 			createInformationDialog("Information", "Success", "Successfully Decrypted");
 		} else {
 			createInformationDialog("Information", "Warning", "Selected invalid file paths");
@@ -120,24 +124,26 @@ public class MainController {
 
 	@FXML
 	protected void onTextEncryptClick() {
-		String data = textAreaTextInput.getText();
-		if (data.isEmpty()) {
+		String message = textAreaTextInput.getText();
+		if (message.isEmpty()) {
 			createInformationDialog("Information", "Warning", "No text to encrypt");
 		} else {
-			// Encode ---
-			textAreaTextOutput.setText(data);
+			byte[] data = message.getBytes(defaultCharset);
+			byte[] encrypted = RSA.encrypt(data);
+			textAreaTextOutput.setText(new String(encrypted));
 			createInformationDialog("Information", "Success", "Successfully Encrypted");
 		}
 	}
 
 	@FXML
 	protected void onTextDecryptClick() {
-		String data = textAreaTextOutput.getText();
-		if (data.isEmpty()) {
+		String message = textAreaTextOutput.getText();
+		if (message.isEmpty()) {
 			createInformationDialog("Information", "Warning", "No text to decrypt");
 		} else {
-			// Decode ---
-			textAreaTextInput.setText(data);
+			byte[] data = message.getBytes(defaultCharset);
+			byte[] decrypted = RSA.decrypt(data);
+			textAreaTextInput.setText(new String(decrypted));
 			createInformationDialog("Information", "Success", "Successfully Decrypted");
 		}
 	}

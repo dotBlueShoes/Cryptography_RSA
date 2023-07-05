@@ -77,12 +77,12 @@ public class RSA {
 		d = Generation.generateD(phi, e);
 	}
 
-	public static void encrypt() {
-
+	public static byte[] encrypt(byte[] nocrypted) {
+		return nocrypted;
 	}
 
-	public static void decrypt() {
-
+	public static byte[] decrypt(byte[] encrypted) {
+		return encrypted;
 	}
 
 	//public static BigInteger encrypt (BigInteger m) {
