@@ -23,6 +23,8 @@ public class MainController {
 	private RSA.Type selectedRSA = RSA.Type.RSA256;
 	private File inputFile, outputFile;
 
+	private byte[] encodedTextArea;
+
 	private void createInformationDialog(
 		final String title,
 		final String header,
@@ -176,55 +178,53 @@ public class MainController {
 			switch (selectedRSA) {
 				default:
 				case RSA256: {
-					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
-					textAreaTextOutput.setText(new String(encrypted));
+					encodedTextArea = RSA.encrypt(data, RSA.RSA256.blockSize);
 				}
 				case RSA512: {
-					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
-					textAreaTextOutput.setText(new String(encrypted));
+					encodedTextArea = RSA.encrypt(data, RSA.RSA256.blockSize);
 				}
 				case RSA1024: {
-					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
-					textAreaTextOutput.setText(new String(encrypted));
+					encodedTextArea = RSA.encrypt(data, RSA.RSA256.blockSize);
 				}
 				case RSA2048: {
-					byte[] encrypted = RSA.encrypt(data, RSA.RSA256.blockSize);
-					textAreaTextOutput.setText(new String(encrypted));
+					encodedTextArea = RSA.encrypt(data, RSA.RSA256.blockSize);
 				}
 			}
 
+			textAreaTextOutput.setText(new String(encodedTextArea));
 			createInformationDialog("Information", "Success", "Successfully Encrypted");
 		}
 	}
 
 	@FXML
 	protected void onTextDecryptClick() {
-		String message = textAreaTextOutput.getText();
-		if (message.isEmpty()) {
+
+		// dangerous ?
+		// String message = textAreaTextOutput.getText();
+
+		if (encodedTextArea == null || encodedTextArea.length == 0) {
 			createInformationDialog("Information", "Warning", "No text to decrypt");
 		} else {
-			byte[] data = message.getBytes(defaultCharset);
+			//byte[] data = encodedTextArea.getBytes(defaultCharset);
+			byte[] decrypted;
 
 			switch (selectedRSA) {
 				default:
 				case RSA256: {
-					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
-					textAreaTextInput.setText(new String(decrypted));
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA256.blockSize);
 				}
 				case RSA512: {
-					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
-					textAreaTextInput.setText(new String(decrypted));
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA256.blockSize);
 				}
 				case RSA1024: {
-					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
-					textAreaTextInput.setText(new String(decrypted));
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA256.blockSize);
 				}
 				case RSA2048: {
-					byte[] decrypted = RSA.decrypt(data, RSA.RSA256.blockSize);
-					textAreaTextInput.setText(new String(decrypted));
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA256.blockSize);
 				}
 			}
 
+			textAreaTextInput.setText(new String(decrypted));
 			createInformationDialog("Information", "Success", "Successfully Decrypted");
 		}
 	}
