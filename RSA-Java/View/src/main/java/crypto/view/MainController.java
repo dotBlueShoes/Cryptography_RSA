@@ -214,13 +214,13 @@ public class MainController {
 					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA256.blockSize, RSA.RSA256.encryptedBlocksSize);
 				} break;
 				case RSA512: {
-					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA512.blockSize, RSA.RSA256.encryptedBlocksSize);
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA512.blockSize, RSA.RSA512.encryptedBlocksSize);
 				} break;
 				case RSA1024: {
-					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA1024.blockSize, RSA.RSA256.encryptedBlocksSize);
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA1024.blockSize, RSA.RSA1024.encryptedBlocksSize);
 				} break;
 				case RSA2048: {
-					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA2048.blockSize, RSA.RSA256.encryptedBlocksSize);
+					decrypted = RSA.decrypt(encodedTextArea, RSA.RSA2048.blockSize, RSA.RSA2048.encryptedBlocksSize);
 				}
 			}
 

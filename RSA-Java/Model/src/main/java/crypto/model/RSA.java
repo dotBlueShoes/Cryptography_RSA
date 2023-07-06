@@ -25,7 +25,7 @@ public class RSA {
 		public static final BigInteger testQ = new BigInteger("340282366920938463463374607431768212629");
 
 		public static final int encryptedBlocksSize = 32; // 32 * 8 = 256
-		public static final int blockSize = 32 - 1;
+		public static final int blockSize = 32 - 2;
 
 	}
 
@@ -50,49 +50,6 @@ public class RSA {
 		public static final int blockSize = 256;
 	}
 
-	public static byte[] bigIntegerToBytes(final BigInteger value) {
-		byte[] bytes = value.toByteArray();
-		byte[] result = new byte[bytes.length];
-		final int lastElement = result.length - 1;
-
-		for (int i = 0, j = lastElement; i < result.length; i++, j--)
-			result[j] = bytes[i];
-
-		{ // DEBUG
-			String temp = "\n\nAfter: ";
-			temp += result[0];
-			for (int i = 1; i < result.length; ++i) {
-				temp += ", ";
-				temp += result[i];
-			}
-			temp += "\n\n";
-			System.out.print(temp);
-		}
-
-		return result;
-	}
-
-	public static BigInteger bytesToBigInteger(final byte[] bytes) {
-		byte[] formatted = new byte[bytes.length + 1];
-		final int lastElement = formatted.length - 1;
-
-		for (int i = 0, j = lastElement; j > 0; i++, j--)
-			formatted[j] = bytes[i];
-
-		{ // DEBUG
-			String temp = "\n\nBefore: ";
-			temp += formatted[0];
-			for (int i = 1; i < formatted.length; ++i) {
-				temp += ", ";
-				temp += formatted[i];
-			}
-			temp += "\n\n";
-			System.out.print(temp);
-		}
-
-		return new BigInteger(formatted);
-	}
-
 	public static BigInteger p, q, n, phi, e, d;
 
 	public static void initialize(final BigInteger newP, final BigInteger newQ) {
@@ -113,7 +70,8 @@ public class RSA {
 
 		ArrayList<BigInteger> nocryptedBlocks = new ArrayList<>();
 		ArrayList<BigInteger> encryptedBlocks = new ArrayList<>();
-		byte[] blockTemp = new byte[blockSize + 1];
+		byte[] blockTemp = new byte[blockSize];
+		byte[] blockEncode;
 
 		int blocksCount = nocrypted.length / blockSize;
 		int leftCount = nocrypted.length % blockSize;
@@ -123,7 +81,8 @@ public class RSA {
 				for (int j = 0; j < blockSize; ++j) {
 					blockTemp[j] = nocrypted[j + (i * blockSize)];
 				}
-				nocryptedBlocks.add(bytesToBigInteger(blockTemp));
+				blockEncode = Numeric.encode(blockTemp); // encode (add 1)
+				nocryptedBlocks.add(Numeric.bytesToBigInteger(blockEncode, false));
 			}
 		}
 
@@ -134,8 +93,8 @@ public class RSA {
 				blockLeft[i] = nocrypted[i + (nocrypted.length - leftCount)];
 			}
 
-			//block = bytesToBigInteger(blockLeft);
-			nocryptedBlocks.add(bytesToBigInteger(blockLeft));
+			blockEncode = Numeric.encode(blockLeft); // encode (add 1)
+			nocryptedBlocks.add(Numeric.bytesToBigInteger(blockEncode, false));
 		}
 
 
@@ -149,7 +108,11 @@ public class RSA {
 		// BUG? Sometimes it's 33 bytes instead 32 last one is 0 in tests therefore I discard it with (32, 64, 128, 256) iteration loop.
 		byte[] result = new byte[encryptedBlocks.size() * encryptedBlockSize], temp;
 		for (int i = 0; i < encryptedBlocks.size(); ++i) {
-			temp = RSA.bigIntegerToBytes(encryptedBlocks.get(i)); // Calc-Get
+			temp = Numeric.bigIntegerToBytes(encryptedBlocks.get(i)); // Calc-Get
+
+			//if (temp.length > 32) {
+			//	break;
+			//}
 
 			// THAT'S THE PROBLEM !
 			//  results with additional 0es in bytes
@@ -165,8 +128,12 @@ public class RSA {
 				//break;
 			}
 
+			// !@#!@%@!#^#$&#$^asdfasgasdgażźćżzżććczxcżźćżććxzc€ó€ó€ó€asąśąśasdadasd!@#!@#!@#!@#!@#
 			// !@#!@%@!#^#$&#$^asdfasgasdgaż ź ćżzżććczxcżźćżććxzc€ó€ó€ó€asąśąśasdadasd!@#!@#!@#!@#!@#
 			// !@#!@%@!#^#$&#$^asdfasgasdgaż��ćżzżććczxcżźćżććxzc€ó€ó€ó€asąśąśasdadasd!@#!@#!@#!@#!@#
+			// czyli w tym wypadku ź jest po części w pierwszych 31 bytach i po części w drugich 31 bytach ...
+			// górny byte jest 0 i jest zjadany ?
+			// dolny byte jest 0 i jest zjadany ?
 
 			//1 // THAT'S THE PROBLEM !
 			//1 // Adding zeroes at begin results with different numbers
@@ -209,14 +176,6 @@ public class RSA {
 
 	public static byte[] decrypt(final byte[] encrypted, final int blockSize, final int encryptedBlocksSize) {
 
-		// 1.
-		//  Construct a single block from data
-		//  Decrypt it and send
-
-		//byte[] blockTemp = new byte[blockSize];
-		//BigInteger block, decoded;
-		//block = bytesToBigInteger(encrypted);
-
 		ArrayList<BigInteger> encryptedBlocks = new ArrayList<>();
 		ArrayList<BigInteger> decryptedBlocks = new ArrayList<>();
 		byte[] blockTemp = new byte[encryptedBlocksSize];
@@ -227,7 +186,7 @@ public class RSA {
 			for (int j = 0; j < encryptedBlocksSize; ++j) {
 				blockTemp[j] = encrypted[j + (i * encryptedBlocksSize)];
 			}
-			encryptedBlocks.add(bytesToBigInteger(blockTemp));
+			encryptedBlocks.add(Numeric.bytesToBigInteger(Numeric.detectNegative(blockTemp), false));
 		}
 
 		{ // Decryption
@@ -241,7 +200,20 @@ public class RSA {
 			int resultLength = 0;
 
 			for (int i = 0; i < decryptedBlocks.size(); ++i) {
-				results.add(RSA.bigIntegerToBytes(decryptedBlocks.get(i)));
+				byte[] temp = Numeric.decode(Numeric.bigIntegerToBytes(decryptedBlocks.get(i))); // decode (remove 1)
+
+				// nope
+				//int tempLength = temp.length - 1;
+				//if (temp[tempLength] == 0 && (temp[tempLength - 1] & 0b10000000) != 0) {
+				//	byte[] replacement = new byte[tempLength];
+				//	for (int x = 0; x < tempLength; ++x) {
+				//		replacement[x] = temp[x];
+				//	}
+				//	temp = replacement;
+				//}
+
+				results.add(temp);
+				//results.add(RSA.bigIntegerToBytes(decryptedBlocks.get(i)));
 				resultLength += results.get(i).length; // that's quite stupid, isn't it ?
 			}
 
@@ -259,6 +231,8 @@ public class RSA {
 			//byte[] result = new byte[decryptedBlocks.size() * encryptedBlockSize], temp;
 			//byte[] temp = RSA.bigIntegerToBytes(decryptedBlocks.get(0));
 
+			// !@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#
+			// !@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#�#�$!%!#$!@#$!�;#�?#!@%!%!#$G\��S������^��Jn6Ⅸ(:�9��
 			// !@#!@#!@%!%!#$!@#$!@#!@$!@$!@$!@$!@$!@$!@$ASFASFASGFASFASVFASFASfasfasfasfasfasfa
 			// !@#!@#!@%!%!#$!@#$!@#!@$!@$!@$! !@#!@#!@ %!%!#$!@#$!@#!@$!@$!@$!!@#!@#!@%!%!#$!@#$!
 
