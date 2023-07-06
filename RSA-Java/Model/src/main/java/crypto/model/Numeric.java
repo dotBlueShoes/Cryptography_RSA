@@ -15,10 +15,9 @@ public class Numeric {
 	//   Normally a number would fit in unsigned format in the same amount of bytes
 	//    however here to make the representation correct a 0-byte is being added at the very end.
 
-
 	// I am adding 0 at the end when BigInteger is negative ....
 	//  this leads to some bigIntegers having 0 as first byte and some not.
-	//  some might have a zero there by default
+	//  some might have a zero there by default ?
 	//  I need to differentiate between those 2.
 	// It seems that I need something like:
 
@@ -42,9 +41,7 @@ public class Numeric {
 	public static byte[] encode(final byte[] data) {
 		byte[] temp = new byte[data.length + 1];
 
-		for (int i = 0; i < data.length; ++i) {
-			temp[i] = data[i];
-		}
+		System.arraycopy(data, 0, temp, 0, data.length);
 
 		temp[data.length] = 1;
 
@@ -56,9 +53,7 @@ public class Numeric {
 	public static byte[] decode(final byte[] data) {
 		byte[] temp = new byte[data.length - 1];
 
-		for (int i = 0; i < temp.length; ++i) {
-			temp[i] = data[i];
-		}
+		System.arraycopy(data, 0, temp, 0, temp.length);
 
 		return temp;
 	}
@@ -72,16 +67,16 @@ public class Numeric {
 		for (int i = 0, j = lastElement; i < result.length; i++, j--)
 			result[j] = bytes[i];
 
-		{ // DEBUG
-			String temp = "\n\nAfter: ";
-			temp += result[0];
-			for (int i = 1; i < result.length; ++i) {
-				temp += ", ";
-				temp += result[i];
-			}
-			temp += "\n\n";
-			System.out.print(temp);
-		}
+		//{ // DEBUG
+		//	String temp = "\n\nAfter: ";
+		//	temp += result[0];
+		//	for (int i = 1; i < result.length; ++i) {
+		//		temp += ", ";
+		//		temp += result[i];
+		//	}
+		//	temp += "\n\n";
+		//	System.out.print(temp);
+		//}
 
 		return result;
 	}
@@ -94,9 +89,7 @@ public class Numeric {
 			formatted = new byte[bytes.length + 1];
 			formatted[bytes.length] = 0;
 
-			for (int i = 0; i < bytes.length; ++i) {
-				formatted[i] = bytes[i];
-			}
+			System.arraycopy(bytes, 0, formatted, 0, bytes.length);
 
 		} else {
 			formatted = bytes;
@@ -106,33 +99,24 @@ public class Numeric {
 
 	}
 
-	public static BigInteger bytesToBigInteger(final byte[] bytes, boolean detectNegative) {
+	public static BigInteger bytesToBigInteger(final byte[] bytes) {
 		byte[] formatted = new byte[bytes.length];
-
-		//if (detectNegative && (bytes[0] & 0b10000000) > 0) {
-		//	formatted = new byte[bytes.length + 1];
-		//	formatted[0] = 0;
-		//
-		//} else {
-		//	formatted = new byte[bytes.length];
-		//
-		//}
 
 		final int lastElement = formatted.length - 1;
 
 		for (int i = 0, j = lastElement; i < bytes.length; i++, j--)
 			formatted[j] = bytes[i];
 
-		{ // DEBUG
-			String temp = "\n\nBefore: ";
-			temp += formatted[0];
-			for (int i = 1; i < formatted.length; ++i) {
-				temp += ", ";
-				temp += formatted[i];
-			}
-			temp += "\n\n";
-			System.out.print(temp);
-		}
+		//{ // DEBUG
+		//	String temp = "\n\nBefore: ";
+		//	temp += formatted[0];
+		//	for (int i = 1; i < formatted.length; ++i) {
+		//		temp += ", ";
+		//		temp += formatted[i];
+		//	}
+		//	temp += "\n\n";
+		//	System.out.print(temp);
+		//}
 
 		return new BigInteger(formatted);
 	}

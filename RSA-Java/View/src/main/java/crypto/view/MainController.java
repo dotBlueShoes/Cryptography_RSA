@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -18,8 +17,7 @@ public class MainController {
 	@FXML
 	private TextArea textAreaP, textAreaQ, textAreaN, textAreaE, textAreaD, textAreaTextInput, textAreaTextOutput;
 
-
-	private final Charset defaultCharset = StandardCharsets.UTF_8; // UTF_16 ???
+	private final Charset defaultCharset = StandardCharsets.UTF_8;
 	private RSA.Type selectedRSA = RSA.Type.RSA256;
 	private File inputFile, outputFile;
 
@@ -69,7 +67,7 @@ public class MainController {
 
 	@FXML
 	protected void onTab2() {
-		// RSA 256 Generation call
+		// RSA 512 Generation call
 		RSA.initialize(RSA.RSA512.testP, RSA.RSA512.testQ);
 		refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
 		selectedRSA = RSA.Type.RSA512;
@@ -77,7 +75,7 @@ public class MainController {
 
 	@FXML
 	protected void onTab3() {
-		// RSA 256 Generation call
+		// RSA 1048 Generation call
 		RSA.initialize(RSA.RSA1024.testP, RSA.RSA1024.testQ);
 		refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
 		selectedRSA = RSA.Type.RSA1024;
@@ -85,7 +83,7 @@ public class MainController {
 
 	@FXML
 	protected void onTab4() {
-		// RSA 256 Generation call
+		// RSA 2048 Generation call
 		RSA.initialize(RSA.RSA2048.testP, RSA.RSA2048.testQ);
 		refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
 		selectedRSA = RSA.Type.RSA2048;
@@ -95,6 +93,12 @@ public class MainController {
 	protected void onFileEncryptClick() {
 		if (inputFile != null && outputFile != null) {
 			byte[] data = FileIO.ReadFileToBytes(inputFile);
+
+			// File Exception.
+			if (data == null) {
+				createInformationDialog("Error", "Error", "Data is null!");
+				return;
+			}
 
 			switch (selectedRSA) {
 				default:
@@ -126,6 +130,12 @@ public class MainController {
 	protected void onFileDecryptClick() {
 		if (inputFile != null && outputFile != null) {
 			byte[] data = FileIO.ReadFileToBytes(inputFile);
+
+			// File Exception.
+			if (data == null) {
+				createInformationDialog("Information", "Error", "Data is null!");
+				return;
+			}
 
 			switch (selectedRSA) {
 				default:
@@ -199,13 +209,14 @@ public class MainController {
 	@FXML
 	protected void onTextDecryptClick() {
 
-		// dangerous ?
+		// displayed text is invalid !
+		//  take bytes instead !
 		// String message = textAreaTextOutput.getText();
 
 		if (encodedTextArea == null || encodedTextArea.length == 0) {
 			createInformationDialog("Information", "Warning", "No text to decrypt");
 		} else {
-			//byte[] data = encodedTextArea.getBytes(defaultCharset);
+			//byte[] decrypted = encodedTextArea.getBytes(defaultCharset);
 			byte[] decrypted;
 
 			switch (selectedRSA) {

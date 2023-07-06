@@ -21,18 +21,20 @@ public class FileIO {
 			return fileContents;
 
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			//throw new RuntimeException(e);
 			// Handle file empty and such errors...
-			// return new byte[]{ 0 };
+			return null;
 		}
 	}
 
 	public static void WriteBytesToFile(String filePath, byte[] data) {
 		try (FileOutputStream fos = new FileOutputStream(filePath)) {
 			fos.write(data);
-			//fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
+			// fos.close(); No need for this line "fos" inside the try.
+			// And this will automatically close the OutputStream
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			//throw new RuntimeException(e);
+			//return;
 		}
 	}
 

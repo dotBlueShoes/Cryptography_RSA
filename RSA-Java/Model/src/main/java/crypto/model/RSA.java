@@ -11,7 +11,7 @@ public class RSA {
 		RSA1024(2),
 		RSA2048(3);
 
-		private int value;
+		private final int value;
 		Type(int value) {
 			this.value = value;
 		}
@@ -64,10 +64,6 @@ public class RSA {
 
 	public static byte[] encrypt(byte[] nocrypted, int blockSize, int encryptedBlockSize) {
 
-		// 1.
-		//  Construct a single block from data
-		//  Encrypt it and send
-
 		ArrayList<BigInteger> nocryptedBlocks = new ArrayList<>();
 		ArrayList<BigInteger> encryptedBlocks = new ArrayList<>();
 		byte[] blockTemp = new byte[blockSize];
@@ -82,7 +78,7 @@ public class RSA {
 					blockTemp[j] = nocrypted[j + (i * blockSize)];
 				}
 				blockEncode = Numeric.encode(blockTemp); // encode (add 1)
-				nocryptedBlocks.add(Numeric.bytesToBigInteger(blockEncode, false));
+				nocryptedBlocks.add(Numeric.bytesToBigInteger(blockEncode));
 			}
 		}
 
@@ -94,25 +90,20 @@ public class RSA {
 			}
 
 			blockEncode = Numeric.encode(blockLeft); // encode (add 1)
-			nocryptedBlocks.add(Numeric.bytesToBigInteger(blockEncode, false));
+			nocryptedBlocks.add(Numeric.bytesToBigInteger(blockEncode));
 		}
 
 
 		{ // Encryption
-			//encoded = block.modPow(e, n);
 			for (var block : nocryptedBlocks) {
 				encryptedBlocks.add(block.modPow(e, n));
 			}
 		}
 
-		// BUG? Sometimes it's 33 bytes instead 32 last one is 0 in tests therefore I discard it with (32, 64, 128, 256) iteration loop.
+		// (Not a BUG) Sometimes it's 33 bytes instead 32 last one is 0 in tests therefore I discard it with (32, 64, 128, 256) iteration loop.
 		byte[] result = new byte[encryptedBlocks.size() * encryptedBlockSize], temp;
 		for (int i = 0; i < encryptedBlocks.size(); ++i) {
 			temp = Numeric.bigIntegerToBytes(encryptedBlocks.get(i)); // Calc-Get
-
-			//if (temp.length > 32) {
-			//	break;
-			//}
 
 			// THAT'S THE PROBLEM !
 			//  results with additional 0es in bytes
@@ -125,51 +116,12 @@ public class RSA {
 					filler[x] = 0;
 				}
 				temp = filler;
-				//break;
 			}
-
-			// !@#!@%@!#^#$&#$^asdfasgasdgażźćżzżććczxcżźćżććxzc€ó€ó€ó€asąśąśasdadasd!@#!@#!@#!@#!@#
-			// !@#!@%@!#^#$&#$^asdfasgasdgaż ź ćżzżććczxcżźćżććxzc€ó€ó€ó€asąśąśasdadasd!@#!@#!@#!@#!@#
-			// !@#!@%@!#^#$&#$^asdfasgasdgaż��ćżzżććczxcżźćżććxzc€ó€ó€ó€asąśąśasdadasd!@#!@#!@#!@#!@#
-			// czyli w tym wypadku ź jest po części w pierwszych 31 bytach i po części w drugich 31 bytach ...
-			// górny byte jest 0 i jest zjadany ?
-			// dolny byte jest 0 i jest zjadany ?
-
-			//1 // THAT'S THE PROBLEM !
-			//1 // Adding zeroes at begin results with different numbers
-			//1 if (temp.length < 32) {
-			//1 	byte[] filler = new byte[encryptedBlockSize];
-			//1 	final int difference = encryptedBlockSize - temp.length;
-			//1 	for (int x = 0; x < difference; ++x) {
-			//1 		filler[x] = 0;
-			//1 	}
-			//1 	for (int x = 0; x < temp.length; ++x) {
-			//1 		filler[difference + x] = temp[x];
-			//1 	}
-			//1 	temp = filler;
-			//1 }
 
 			for (int j = 0; j < encryptedBlockSize; ++j) { // Copy
 				result[j + (i * encryptedBlockSize)] = temp[j]; // here ?
 			}
 		}
-
-		//System.out.print(encryptedBlocks.get(0));
-		//byte[] result = RSA.bigIntegerToBytes(encryptedBlocks.get(0));
-
-		//{ // TEST1
-		//	byte[] sample = new byte[result.length - 1];
-		//	for (int i = 0; i < sample.length; ++i) {
-		//		sample[i] = result[i];
-		//	}
-		//	BigInteger rsample = bytesToBigInteger(sample);
-		//	System.out.print(rsample);
-		//}
-
-		// !@#!%$!%$!@$!@$!@ - 33 its negation 0 is being placed last if last one has 1000'0000 set on it.
-		// asdasd - 32
-		
-		// therefore I need to remove that byte inside bigIntegerToBytes right ?
 		
 		return result;
 	}
@@ -186,7 +138,7 @@ public class RSA {
 			for (int j = 0; j < encryptedBlocksSize; ++j) {
 				blockTemp[j] = encrypted[j + (i * encryptedBlocksSize)];
 			}
-			encryptedBlocks.add(Numeric.bytesToBigInteger(Numeric.detectNegative(blockTemp), false));
+			encryptedBlocks.add(Numeric.bytesToBigInteger(Numeric.detectNegative(blockTemp)));
 		}
 
 		{ // Decryption
@@ -202,18 +154,7 @@ public class RSA {
 			for (int i = 0; i < decryptedBlocks.size(); ++i) {
 				byte[] temp = Numeric.decode(Numeric.bigIntegerToBytes(decryptedBlocks.get(i))); // decode (remove 1)
 
-				// nope
-				//int tempLength = temp.length - 1;
-				//if (temp[tempLength] == 0 && (temp[tempLength - 1] & 0b10000000) != 0) {
-				//	byte[] replacement = new byte[tempLength];
-				//	for (int x = 0; x < tempLength; ++x) {
-				//		replacement[x] = temp[x];
-				//	}
-				//	temp = replacement;
-				//}
-
 				results.add(temp);
-				//results.add(RSA.bigIntegerToBytes(decryptedBlocks.get(i)));
 				resultLength += results.get(i).length; // that's quite stupid, isn't it ?
 			}
 
@@ -228,36 +169,9 @@ public class RSA {
 				currentElementIndex += results.get(i).length;
 			}
 
-			//byte[] result = new byte[decryptedBlocks.size() * encryptedBlockSize], temp;
-			//byte[] temp = RSA.bigIntegerToBytes(decryptedBlocks.get(0));
-
-			// !@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#
-			// !@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#!@#!@%!%!#$!@#$!!@#�#�$!%!#$!@#$!�;#�?#!@%!%!#$G\��S������^��Jn6Ⅸ(:�9��
-			// !@#!@#!@%!%!#$!@#$!@#!@$!@$!@$!@$!@$!@$!@$ASFASFASGFASFASVFASFASfasfasfasfasfasfa
-			// !@#!@#!@%!%!#$!@#$!@#!@$!@$!@$! !@#!@#!@ %!%!#$!@#$!@#!@$!@$!@$!!@#!@#!@%!%!#$!@#$!
-
-			// !@#!@#!@%!%!#$!@#$!@#!@$@$ASFASFASGFASFASVFASFASfasfasfasfasfasfa
-			// !@#!@#!@%!%!#$!@#$!@#!@$@$ASFAS!@#!@#!@%!%!#$!@#$!@#!@$@$ASFAS!@#
-
 			return result;
 		}
 
 	}
-
-	//public static BigInteger encrypt (BigInteger m) {
-	// return m.modPow(e,n);
-	// }
-
-    //public static BigInteger decrypt (BigInteger c) {
-    //    return c.modPow(d,n);
-    //}
-
-    //public BigInteger getE() {
-    //    return e;
-    //}
-
-    //public BigInteger getD() {
-    //    return d;
-    //}
 
 }

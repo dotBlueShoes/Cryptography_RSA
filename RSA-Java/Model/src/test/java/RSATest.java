@@ -8,12 +8,12 @@ import static org.junit.Assert.assertArrayEquals;
 
 public class RSATest {
 
-	public static class RSA256 {
-		String textInput0 = "";
-		String textInput1 = "ŁŹĄĄŚĄŚĄŚŃĘŚĘ$^(#6!@#^!#%!@$%!@^@#*$^IUIJEHAQEGQ@!@%RTFasfash(^&)%&*$%^@#t%";
-		String textInput2 = "";
-		String textInput3 = "";
-	}
+	//public static class RSA256 {
+	//	String textInput0 = "";
+	//	String textInput1 = "ŁŹĄĄŚĄŚĄŚŃĘŚĘ$^(#6!@#^!#%!@$%!@^@#*$^IUIJEHAQEGQ@!@%RTFasfash(^&)%&*$%^@#t%";
+	//	String textInput2 = "";
+	//	String textInput3 = "";
+	//}
 
 	@Test
 	public void bigIntegerTest1() {
@@ -28,7 +28,7 @@ public class RSATest {
 			-59, -68, -59
 		};
 
-		BigInteger temp = Numeric.bytesToBigInteger(sample, false);
+		BigInteger temp = Numeric.bytesToBigInteger(sample);
 		byte[] result = Numeric.bigIntegerToBytes(temp);
 
 		assertArrayEquals(
@@ -70,7 +70,7 @@ public class RSATest {
 
 		//System.out.print(sample[0]);
 		//byte[] sample = { 0, 1, 2, 3, 4, 5, 6 };
-		BigInteger temp = Numeric.bytesToBigInteger(sample, false);
+		BigInteger temp = Numeric.bytesToBigInteger(sample);
 
 		byte[] result = Numeric.bigIntegerToBytes(temp);
 
@@ -95,7 +95,7 @@ public class RSATest {
 		};
 
 		byte[] encoded = Numeric.encode(sample);
-		BigInteger temp = Numeric.bytesToBigInteger(encoded, false);
+		BigInteger temp = Numeric.bytesToBigInteger(encoded);
 		byte[] result = Numeric.bigIntegerToBytes(temp);
 		byte[] decoded = Numeric.decode(result);
 
@@ -132,7 +132,7 @@ public class RSATest {
 		};
 
 		byte[] formatted = Numeric.detectNegative(sample);
-		BigInteger temp = Numeric.bytesToBigInteger(formatted, false);
+		BigInteger temp = Numeric.bytesToBigInteger(formatted);
 		byte[] encoded = Numeric.bigIntegerToBytes(temp);
 		//byte[] decoded = Numeric.decode(encoded);
 
