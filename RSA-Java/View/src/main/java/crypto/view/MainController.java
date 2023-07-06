@@ -2,6 +2,8 @@ package crypto.view;
 
 import crypto.model.FileIO;
 import crypto.model.RSA;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -10,6 +12,7 @@ import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -22,6 +25,66 @@ public class MainController {
 	private File inputFile, outputFile;
 
 	private byte[] encodedTextArea;
+
+	public void lateInit() {
+		textAreaP.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
+			if (!newPropertyValue) {
+				String temp =  textAreaP.getText();
+				try {
+					RSA.p = new BigInteger(temp);
+				} catch (NumberFormatException e) {
+					createInformationDialog("Error", "Error", "Number Format Exception!");
+				}
+			}
+		});
+		textAreaQ.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
+			if (!newPropertyValue) {
+				String temp =  textAreaQ.getText();
+				try {
+					RSA.q = new BigInteger(temp);
+				} catch (NumberFormatException e) {
+					createInformationDialog("Error", "Error", "Number Format Exception!");
+				}
+			}
+		});
+		textAreaN.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
+			if (!newPropertyValue) {
+				String temp =  textAreaN.getText();
+				try {
+					RSA.n = new BigInteger(temp);
+				} catch (NumberFormatException e) {
+					createInformationDialog("Error", "Error", "Number Format Exception!");
+				}
+			}
+		});
+		textAreaE.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
+			if (!newPropertyValue) {
+				String temp =  textAreaE.getText();
+				try {
+					RSA.e = new BigInteger(temp);
+				} catch (NumberFormatException e) {
+					createInformationDialog("Error", "Error", "Number Format Exception!");
+				}
+			}
+		});
+		textAreaD.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
+			if (!newPropertyValue) {
+				String temp =  textAreaD.getText();
+				try {
+					RSA.d = new BigInteger(temp);
+				} catch (NumberFormatException e) {
+					createInformationDialog("Error", "Error", "Number Format Exception!");
+				}
+			}
+		});
+	}
+
+	@FXML
+	protected void onGenerateClick() {
+		RSA.initialize(RSA.p, RSA.q);
+		//System.out.print("here!");
+		refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
+	}
 
 	private void createInformationDialog(
 		final String title,

@@ -53,6 +53,11 @@
                   </padding>
                </Label>
                <TextArea fx:id="textAreaQ" prefHeight="2000.0" prefWidth="192.0" />
+               <Button alignment="CENTER" mnemonicParsing="false" onAction="#onGenerateClick" text="Generate">
+                  <HBox.margin>
+                     <Insets left="10.0" />
+                  </HBox.margin>
+               </Button>
             </children>
          </HBox>
          <HBox prefHeight="0.0" prefWidth="0.0">

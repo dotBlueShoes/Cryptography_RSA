@@ -21,6 +21,7 @@ public class WindowApplication extends Application {
 			RSA.initialize(RSA.RSA256.testP, RSA.RSA256.testQ);
 		}
 		controller.refreshTextAreaParameters(RSA.p.toString(), RSA.q.toString(), RSA.n.toString(), RSA.e.toString(), RSA.d.toString());
+		controller.lateInit();
 
 		stage.show();
 	}
